@@ -1,0 +1,139 @@
+out_file:    global_restatement_sorghum_100-day-opt.3min-era5.1981-2018
+outtypes:    .SNX,.json
+
+# global parameters
+ref_year: 1979
+num_years: 43
+scen_years: 43
+scens: 42
+
+delta: 3,3
+tdelta: 120,120
+
+num_lats: 3600
+num_lons: 7200
+lat_zero: 90
+lon_zero: -180
+irr_flag: true
+irr_1st: true
+
+separate_variables: false
+# harvested_area: gs://praedictus_psims/data/masks/weights/geo-wiki/cropland.area.nc4
+
+# Variables to extract
+#required variables: PDAT,ADAT,MDAT,HDAT,HWAM,CWAM
+variables:   PDAT,ADAT,MDAT,HDAT,HWAM,CWAM,IRCM,ETCM,ETCP,ROCM,DRCM,TMAXA,TMINA,PRCP,PRCM,CO2A,SRADA
+var_units:   "DOY,Days,Days,Days,kg/ha,kg/ha,mm,mm,mm,mm,mm,K,K,mm,mm,ppm,W/m2"
+long_names:  "Planting,Anthesis,Maturity,Harvest,Yield,Biomass,Irrigation,SimSeasonET,GrowingSeasonET,SimSeasonRunnoff,SimSeasonDrainage,MaxTemp,MinTemp,GrowingSeasonPrecip,SimSeasonPrecip,CO2,SolarRad"
+
+#don't need daily in this case
+#daily_variables: SRAA,TMAXA,TMINA,VWAD,CWAD,WSPD,WSGD,EWSD,SWXD,PREC,SW1D,SW2D,SW3D,PRED,SRAD,CLDD,TMXD,TMND,TAVD,TDYD,TGAD,TGRD,PHAD
+
+#need to update names for climfile
+# checker:
+#   class: translators.common.simplechecker.SimpleChecker
+#   climfile: era5.clim.tile.nc4
+#   soilfile: gsde.soil.tile.nc4
+#   threshold: 0
+
+stageinputs:
+  class: translators.common.stage_inputs_google_cloud.StageInputsGoogleCloud
+  weather:
+  - gs://praedictus_psims/data/clim/era5
+  weather_outputs:
+  - era5.clim.tile.nc4
+  soils:
+  - gs://praedictus_psims/data/soils/gsde/gsde.2deg.tile
+  soils_outputs:
+  - gsde.soil.tile.nc4
+  refdata: gs://praedictus_psims/campaigns/pdssat/common46
+
+
+tapptilesoil:
+    class: translators.common.tile_translator_soil.SoilTileTranslator
+    inputfile: gsde.soil.tile.nc4
+
+tapptilewth:
+  class: translators.common.tile_translator.TileTranslator
+  inputfile:
+  - era5.clim.tile.nc4
+  outputfile:
+  - era5.clim.nc4
+  variables:
+  - precip,tmax,tmin,rsds
+  slicefirst:
+  - false
+  pad_year: true
+  pad_next_year: true
+
+tappcmp:
+    class: translators.common.camp2json.Camp2Json
+    campaignfile:
+    - Campaign.nc4
+    - wst-id.nc4
+    expfile:       exp_template.json
+    outputfile:    experiment.json
+    y2k:           True
+
+
+pretranslator:
+    class: translators.common.highfrequencyforecaster_v2.HighFrequencyForecaster_v2
+    inputfile: era5.clim.nc4  # daily dataset used for the realized and continuations
+    ncont: 42                 # number of continuations per forecast
+    startday: 1               # DDD, start day of sim, forecast day refers to startday, so set to day 1
+    years: 2021               # YYYY, assumes time meta-data is of form "days since YYYY blah" or something
+    forecastday: 151          # DDD, first day using forecast data (assumes "days since YYYY-MM-DD blah")
+    rngseed: 0                # random number generator seed for linking continuations with forecasts
+    outputfile: hff.clim.nc4
+
+prepend:
+    class: translators.common.hff_prepender.HffPrepender
+    variables: precip,tmax,tmin,rsds
+    climate_input: era5.clim.nc4
+    hff_input: hff.clim.nc4
+
+tappwth:
+  class: translators.dssat.psims2wth.Psims2Wth
+  inputfile: era5.clim.nc4
+  variables: precip,tmax,tmin,rsds
+
+tappinp:
+  class: translators.dssat.jsons2dssatlong.Jsons2DssatLong
+  Xfile: X1234567.SNX
+  sfile: gsde.soil.nc4
+  efile: experiment.json
+  SOLfile: SOIL.SOL
+  CULfile: SGCER046.CUL
+  ECOfile: SGCER046.ECO
+  pfcn: true
+  version: 4.6
+  y2k: true
+
+model:
+  class: translators.dssat.dssat.Dssat
+  executable: /psims/bin/DSCSM046.EXE A X1234567.SNX 
+
+
+postprocess:
+    class: translators.dssat.out2psims.Out2Psims
+    inputfile: Summary.OUT
+    preserve_mdat: True
+
+#Need to decide where to write outputs
+stageoutputs:
+  class: translators.common.stage_outputs_google_cloud.StageOutputsGoogleCloud
+  prefix: gs://praedictus_psims/outputs/pdssat/brazil
+
+
+tappnooutput:
+  class: translators.common.nooutput2psims.NoOutput2Psims
+  error_handler: true
+
+
+#aggregator:
+#  aggfile: gs://praedictus_psims/data/masks/agg/gadm/global.3arc.nc4
+#  agg_fail_null: true
+#  yield_var: HWAM
+#  levels: gadm0,gadm1,gadm2
+#  regions: 235,3359-3409,40927-44074
+

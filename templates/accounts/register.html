@@ -1,0 +1,154 @@
+{% extends "layouts/base-fullscreen.html" %}
+
+{% block title %} Login {% endblock %}
+
+{% block content %}   
+<style>
+
+.form{
+    text-align: left !important;
+}
+.text-muted{
+    font-size: 15px;
+    margin-bottom: 0px;
+}
+
+
+
+</style>
+    <div class="auth-wrapper">
+        <div class="auth-content">
+            <div class="auth-bg">
+                <span class="r"></span>
+                <span class="r s"></span>
+                <span class="r s"></span>
+                <span class="r"></span>
+            </div>
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="mb-4">
+                        <i class="feather icon-user-plus auth-icon"></i>
+                    </div>
+                    <h3 class="mb-4">Sign up free</h3>
+                    <p style="font-size: 17px;">To view Praedictus US national level corn and soybean yield updates</p>
+
+                    <span class="mb-0 text-muted">
+                        {% if msg %}
+                            {{ msg | safe }}
+                        {% elif access_msg %}
+                            {{ access_msg | safe }}
+                        {% else %}
+                            Add your credentials
+                        {% endif %} 
+                    </span>
+
+                    <br />
+                    <br />
+                    
+                    <!-- Hide the form on success-->
+                    {% if not success %}
+                    <form role="form" method="post" action="">
+                        
+                        {% csrf_token %}      
+                        {% if exist %}  
+                        <label class="form" for="username" >Username *</label>
+                        <div class="input-group mb-3">
+                        
+                            {{ form.username }}
+                        </div>
+                        <span class="text-error">{{ form.username.errors }}</span>                               
+                        <span class="text-error">Username already exist</span>                               
+                        {% else %}
+                        <label class="form" for="username" >Username *</label>
+                        <div class="input-group mb-3">
+                        
+                            {{ form.username }}
+                        </div>
+                        <span class="text-error">{{ form.username.errors }}</span>
+                        {% endif %}
+                        <label for="email" >Email *</label>
+                        <div class="input-group mb-3">
+                            {{ form.email }}
+                        </div>
+                        <span class="text-error">{{ form.email.errors }}</span>
+
+                        <label for="first_name" >First Name *</label>
+                        <div class="input-group mb-3">
+                            {{ form.first_name }}
+                        </div>
+                        <span class="text-error">{{ form.first_name.errors }}</span>
+
+
+                        <label for="last_name" >Last Name *</label>
+                        <div class="input-group mb-3">
+                            {{ form.last_name }}
+                        </div>
+                        <span class="text-error">{{ form.last_name.errors }}</span>  
+
+
+                        <label for="company" >Company *</label>
+                        <div class="input-group mb-3">
+                            {{ form.company }}
+                        </div>
+                        <span class="text-error">{{ form.company.errors }}</span>  
+                                      
+                        
+                        <label for="title" >Title</label>
+                        <div class="input-group mb-3">
+                            {{ form.title }}
+                        </div>
+                        <span class="text-error">{{ form.title.errors }}</span>  
+                                       
+                        
+                        <label for="phone_number" >Phone Number</label>
+                        <div class="input-group mb-3">
+                            {{ form.phone_number }}
+                        </div>
+                        <span class="text-error">{{ form.phone_number.errors }}</span>  
+                                              
+                        <label for="crops" >Crops/Regions of interests
+                        (not required but helps us prioritize production analysis)
+                        </label>                  
+                        <div class="input-group mb-3">
+                            {{ form.crops_regions }}
+                        </div>
+                        <span class="text-error">{{ form.crops_regions.errors }}</span>  
+                                              
+
+                        <label for="password1" >Password *</label>
+                        <div class="input-group mb-4">
+                            {{ form.password1 }}
+                        </div>
+                        <span class="text-error">{{ form.password1.errors }}</span>
+
+
+                        <label for="password2" >Repeat Password *</label>
+                        <div class="input-group mb-4">
+                            {{ form.password2 }}
+                        </div>
+                        <span class="text-error">{{ form.password2.errors }}</span>
+                        
+                        <div class="form-group text-left">
+                            <div class="checkbox checkbox-fill d-inline">
+                                <input type="checkbox" name="checkbox-fill-1" id="checkbox-fill-a1" checked="">
+                                <label for="checkbox-fill-a1" class="cr"> Agree with <a href="#">terms</a></label>
+                            </div>
+                        </div>
+                        <button type="submit" name="register" class="btn btn-primary shadow-2 mb-4">Register</button>
+
+                    </form>
+                    {% endif %}
+                    
+                    <p class="mb-0 text-muted">Already have an account? <a href="{% url 'login' %}" >Login</a></p>
+                    <br />
+
+                    <p class="mb-2 text-muted">
+                        &copy; <a target="_blank" rel="noopener noreferrer"
+                        href="https://www.praedictus.com">Praedictus</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}

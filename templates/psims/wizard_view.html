@@ -1,0 +1,105 @@
+{% extends "layouts/base.html" %}
+{% load i18n %}
+
+{% block title %} Praedictus Modeling Tool {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}
+        <link rel="stylesheet" href="/static/psims/css/local.css">
+        {% if wizard.steps.step1 == 5 %}
+        <script>
+
+            var datepicker_start = '{{planting_date}}'
+            console.log("datepicker_start", datepicker_start);
+            
+        </script>
+        {% endif %}
+
+      
+
+{% endblock stylesheets %}
+
+{% block content %}
+
+    <form class= "form-group" action="" method="post">
+     {% csrf_token %}
+     {{ wizard.management_form }}
+
+    <div class="pcoded-content">
+        <div class="pcoded-inner-content">
+            <!-- [ breadcrumb ] start -->
+            <div class="page-header">
+                <div class="page-block">
+                    <div class="row align-items-center">
+                        <div class="col-md-12">
+                            <div class="page-header-title">
+                                <h5 class="m-b-10">Praedictus Yield Lab</h5>
+                                
+                            </div>
+                            <ul class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a></li>
+                                <li class="breadcrumb-item"><a href="javascript:">{% if success %}Processing...{% endif %}</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- [ breadcrumb ] end -->
+
+            <div class="main-body">
+                <div class="page-wrapper">
+                    <!-- [ Main Content ] start -->
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card">
+{#                                <div class="card-header">#}
+{#                                    <h5>Praedictus Yield Lab</h5>#}
+{#                                </div>#}
+                                <div class="card-block">
+                                    {% if success %}
+                                    <span class='success_message' id="message" style="font-size: 20px;">Your crop is being processed, please wait...</span>
+                                    
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- [ Main Content ] end -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+     </form>
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+{% if success %}
+<script>    
+    const startTime = new Date()
+    const interval = setInterval(() => {
+        fetch('/api/check-status/')
+            .then(response => response.json())
+            .then(data => {
+                if(data.completed) {
+                    console.log(data)
+                    $(".pcoded-wrapper").prepend(`<div class="alert alert-success alert-dismissible">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong>Success!</strong> Your {{ location_name }}, {{ crop_name }} crop is complete. View in <a href="/{{ user }}/results/{{ parent_id }}"> My Yield Indices </a>now.
+            </div>`)
+                    document.getElementById('message').innerHTML = `Your {{ location_name }}, {{ crop_name }} crop has been planted <br> Your results will be ready shortly here:<a href="/{{ user }}/results/{{ parent_id }}"> My Yield Indices </a>`;
+
+                    clearInterval(interval)
+
+
+                }
+            })
+
+    }, 1500)
+</script>>{% endif %}
+
+
+
+{% endblock javascripts %}
+

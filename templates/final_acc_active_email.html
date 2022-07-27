@@ -1,0 +1,13 @@
+{% autoescape off %}
+Hi,
+Please click on the link to confirm user registration:
+
+Username: {{ user.username }}
+First Name: {{ user.first_name }}
+Last Name: {{ user.last_name }}
+Company: {{ user.profile.company }}
+Title: {{ user.profile.title }}
+Phone Number: {{ user.profile.phone_number }}
+Crops/Regions: {{ user.profile.crops_regions }}
+http://{{ domain }}{% url 'final_activate' uidb64=uid token=token %}
+{% endautoescape %}

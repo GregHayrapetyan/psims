@@ -1,0 +1,123 @@
+out_file:    global_restatement_wheat_100-day-opt.3min-wfdei.1981-2018
+outtypes:    .SNX,.json
+
+# global parameters
+ref_year: 1979
+num_years: 40
+scen_years: 40
+scens: 1    # just do irrigated for optimzation
+
+delta: 3,3
+tdelta: 120,120
+
+num_lats: 3600
+num_lons: 7200
+lat_zero: 90
+lon_zero: -180
+irr_flag: true
+irr_1st: true
+
+separate_variables: false
+# harvested_area: gs://praedictus_psims/data/masks/weights/geo-wiki/cropland.area.nc4
+
+# Variables to extract
+#required variables: PDAT,ADAT,MDAT,HDAT,HWAM,CWAM
+variables:   PDAT,ADAT,MDAT,HDAT,HWAM,CWAM,IRCM,ETCM,ETCP,ROCM,DRCM,TMAXA,TMINA,PRCP,PRCM,CO2A,SRADA
+var_units:   "DOY,Days,Days,Days,kg/ha,kg/ha,mm,mm,mm,mm,mm,K,K,mm,mm,ppm,W/m2"
+long_names:  "Planting,Anthesis,Maturity,Harvest,Yield,Biomass,Irrigation,SimSeasonET,GrowingSeasonET,SimSeasonRunnoff,SimSeasonDrainage,MaxTemp,MinTemp,GrowingSeasonPrecip,SimSeasonPrecip,CO2,SolarRad"
+
+#don't need daily in this case
+#daily_variables: SRAA,TMAXA,TMINA,VWAD,CWAD,WSPD,WSGD,EWSD,SWXD,PREC,SW1D,SW2D,SW3D,PRED,SRAD,CLDD,TMXD,TMND,TAVD,TDYD,TGAD,TGRD,PHAD
+
+#need to update names for climfile
+# checker:
+#   class: translators.common.simplechecker.SimpleChecker
+#   climfile: wfdei.clim.tile.nc4
+#   soilfile: gsde.soil.tile.nc4
+#   threshold: 0
+
+stageinputs:
+  class: translators.common.stage_inputs_google_cloud.StageInputsGoogleCloud
+  weather:
+  - gs://praedictus_psims/data/clim/wfdei
+  weather_outputs:
+  - wfdei.clim.tile.nc4
+  soils:
+  - gs://praedictus_psims/data/soils/gsde/gsde.2deg.tile
+  soils_outputs:
+  - gsde.soil.tile.nc4
+  refdata: gs://praedictus_psims/campaigns/pdssat/common46
+
+
+tapptilesoil:
+    class: translators.common.tile_translator_soil.SoilTileTranslator
+    inputfile: gsde.soil.tile.nc4
+
+tapptilewth:
+  class: translators.common.tile_translator.TileTranslator
+  inputfile:
+  - wfdei.clim.tile.nc4
+  outputfile:
+  - wfdei.clim.nc4
+  variables:
+  - tasmin,tasmax,rsds,pr
+  slicefirst:
+  - false
+  - false
+  pad_year: true
+  pad_next_year: true
+
+
+tappcmp:
+    class: translators.common.camp2json.Camp2Json
+    campaignfile:
+    - Campaign.nc4
+    expfile:       exp_template.json
+    outputfile:    experiment.json
+    y2k:           True
+
+tappwth:
+  class: translators.dssat.psims2wth.Psims2Wth
+  inputfile: wfdei.clim.nc4
+  variables: tasmin,tasmax,rsds,pr
+
+tappinp:
+  class: translators.dssat.jsons2dssatlong.Jsons2DssatLong
+  Xfile: X1234567.SNX
+  sfile: gsde.soil.nc4
+  efile: experiment.json
+  SOLfile: SOIL.SOL
+  ECOfile: WHCER046.ECO
+  CULfile: WHCER046.CUL
+  pfcn: true
+  version: 4.6
+  y2k: true
+
+model:
+  class: translators.dssat.dssat.Dssat
+  executable: /psims/bin/DSCSM046.EXE A X1234567.SNX 
+
+
+postprocess:
+    class: translators.dssat.out2psims.Out2Psims
+    inputfile: Summary.OUT
+    preserve_mdat: True
+
+#Need to decide where to write outputs
+stageoutputs:
+  class: translators.common.stage_outputs_google_cloud.StageOutputsGoogleCloud
+  prefix: gs://praedictus_psims/outputs/pdssat/brazil
+
+
+tappnooutput:
+  class: translators.common.nooutput2psims.NoOutput2Psims
+  error_handler: true
+
+
+#aggregator:
+#  aggfile: gs://praedictus_psims/data/masks/agg/gadm/global.3arc.nc4
+#  agg_fail_null: true
+#  yield_var: HWAM
+#  levels: gadm0,gadm1,gadm2
+#  regions: 235,3359-3409,40927-44074
+

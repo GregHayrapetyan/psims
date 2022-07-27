@@ -1,0 +1,12 @@
+name,name_long,units
+IR001,Furrow,mm
+IR002,Alternating furrows,mm
+IR003,Flood,mm
+IR004,Sprinkler,mm
+IR005,Drop or trickle,mm
+IR006,Flood depth,mm
+IR007,Water table depth,mm
+IR008,Percolation rate,mm day-1
+IR009,Bund height,mm
+IR010,Puddling (for Rice only),unknown
+IR011,Constant flood depth,mm

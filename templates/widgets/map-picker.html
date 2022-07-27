@@ -1,0 +1,861 @@
+{% load static %}
+{% if name == '1-latitude' %}
+<style>
+  #map {
+    height: 400px;
+    width: 100%;
+  }
+  #plus-marker{
+    background: none;
+    color: inherit;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+    outline: inherit;
+    margin-bottom: 0px !important;
+    margin-top: 5px !important;
+  }
+
+  label[for=id_1-latitude],
+  label[for=id_1-longitude] {
+    display: none;
+  }
+
+  label[for=id_1-name] {
+    display: block;
+  }
+
+  input[name='1-latitude'],
+  input[name='1-longitude'] {
+    width: 100%;
+    display: inline-block;
+    margin-top: 40px;
+  }
+
+  input[name='1-name'] {
+    width: 100%;
+  }
+
+  .input_label {
+    position: absolute;
+    left: 0;
+    top: 12px;
+  }
+
+  .input_group_content {
+    width: 49.4%;
+  }
+
+
+
+  .pac-card {
+    margin: 10px 10px 0 0;
+    border-radius: 2px 0 0 2px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    outline: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    background-color: #fff;
+    font-family: Roboto;
+  }
+
+  #pac-container {
+    padding-bottom: 12px;
+    margin-right: 12px;
+  }
+
+  .pac-controls {
+    display: inline-block;
+    padding: 5px 11px;
+  }
+
+  .pac-controls label {
+    font-family: Roboto;
+    font-size: 13px;
+    font-weight: 300;
+  }
+
+  #pac-input {
+    width: 400px;
+    background-color: #fff;
+    font-family: Roboto;
+    font-size: 15px;
+    font-weight: 300;
+    margin-left: 12px;
+    top: 10px !important;
+    left: calc(50% - 200px) !important;
+    padding: 0 11px 0 13px;
+    text-overflow: ellipsis;
+  }
+
+  @media (max-width: 991px) {
+    #pac-input {
+      width: 200px;
+      left: calc(50% - 40px) !important;
+      margin: 0;
+    }
+  }
+
+  @media (max-width: 568px) {
+    #pac-input {
+      width: 95%;
+      top: 55px !important;
+      left: 2.5% !important;
+    }
+  }
+
+  .gm-style-pbc {
+    display: none !important;
+  }
+
+  .gm-style-moc {
+    display: none !important;
+  }
+</style>
+{% if name == '1-latitude' %}
+Choose Location:
+{% endif %}
+<div class="d-flex justify-content-between">
+  <div id="map"></div>
+</div>
+
+<!-- <button type="button" id="plus-marker" style="width: 40px; height: 40px;">
+  <img width="100%" height="100%" src="{% static 'psims/img/plus.png' %}" alt="">
+</button> -->
+<input id="delete-marker-button" style="width: auto; font-size: 15px; cursor: pointer;" type="button" value="Delete selected point" />
+<!-- <input id="delete-button" style="width: auto; font-size: 15px; cursor: pointer;" type="button" value="Delete selected shape" /> -->
+<input id="save-button" style="width: auto; font-size: 15px; cursor: pointer;" type="button" value="Save all" />
+{% endif %}
+{% if name == '1-latitude' %}
+<div class="d-flex justify-content-between">
+  {% endif %}
+  <div class="input_group_content">
+    <div class="position-relative">
+      <label class="input_label" for='{{name}}'> {% if name == '1-latitude' %}Latitude{% else %}Longitude{% endif %}:
+      </label>
+      <input name="{{name}}" id="{{name}}" value="{{value}}" />
+    </div>
+  </div>
+  {% if not name == '1-latitude' %}
+</div>
+{% endif %}
+
+
+{% if name == '1-latitude' %}
+<script>var latitude = parseInt('{{value}}')</script>
+{% else %}
+<script>var longitude = parseInt('{{value}}')</script>
+
+{% if name == '1-name' %}
+<script>var name = parseInt('{{value}}')
+</script>
+
+
+{% endif %}
+<script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+<script async defer
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCzGyIduRaoE7Fy07agxGtPPDI_xsMtSJk&region=EN&language=en&callback=initMap&libraries=places,drawing,geometry&v=weekly"
+  type="text/javascript">
+
+  </script>
+<script>
+
+  async function initMap() {
+    function toUniqueArray(a) {
+      let newArray = [];
+
+      for (let i = 0; i < a.length; i++) {
+        if (newArray.indexOf(a[i]) === -1) {
+          newArray.push(a[i]);
+        }
+      }
+      return newArray
+    }
+    var myLatLng = { lat: latitude, lng: longitude };
+    var map = new google.maps.Map(document.getElementById('map'), {
+      zoom: 4,
+      center: myLatLng  
+    });
+    var geocoder = new google.maps.Geocoder();
+
+    // var marker = new google.maps.Marker({
+    //   position: myLatLng,
+    //   map: map,
+    //   title: 'Selected location'
+    // });
+
+
+    // Create the search box and link it to the UI element.
+    const input = document.createElement("input");
+    input.setAttribute('id', 'pac-input')
+    input.setAttribute('placeholder', 'Search Box')
+    const searchBox = await new google.maps.places.SearchBox(input);
+    map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+    // Bias the SearchBox results towards current map's viewport.
+    map.addListener("bounds_changed", () => {
+      searchBox.setBounds(map.getBounds());
+    });
+
+    let markers = [];
+
+    var all_data = {}
+    // function placeRequest(url, address, addresses) {
+    //   fetch(url)
+    //     .then((response) => {
+    //       return response.json();
+    //     })
+    //     .then((data) => {
+    //       var data_coords = [];
+    //       function get_coords(arr) {
+    //         for (let i in arr) {
+    //           if (typeof arr[i][0] === 'number') {
+    //             data_coords.push(arr[i])
+
+    //           } else {
+    //             get_coords(arr[i])
+    //           }
+    //         }
+    //       }
+    //       for (let j in data) {
+    //         if (data[j].geojson.type == "MultiPolygon") {
+    //           json_data = []
+    //           for (e in data[j].geojson.coordinates) {
+    //             for (p in data[j].geojson.coordinates[e]) {
+    //               get_coords(data[j].geojson.coordinates[e][p])
+    //               var data_geo = {
+    //                 type: "Feature",
+    //                 "properties": {
+    //                   'address': address
+    //                 },
+    //                 geometry: {
+    //                   "type": "Polygon",
+    //                   "coordinates": [data_coords]
+    //                 }
+    //               };
+    //               json_data.push(data_coords)
+
+    //               all_data[address] = json_data
+
+    //               map.data.addGeoJson(data_geo);
+    //               let map_data = null
+    //               map.data.addListener('click', function (event) {
+
+    //                 map_data = event
+    //                 map.data.forEach(element => {
+    //                   if (element.i.address === event.feature.i.address) {
+    //                     map.data.overrideStyle(element, {
+    //                       fillColor: 'red',
+    //                       strokeColor: 'red'
+    //                     });
+    //                   }
+    //                   else {
+    //                     map.data.overrideStyle(element, {
+    //                       fillColor: 'black',
+    //                       strokeColor: 'black'
+    //                     })
+    //                   }
+
+    //                 });
+
+    //               });
+    //               document.getElementById('delete-button').addEventListener('click', () => {
+    //                 if (all_data[map_data.feature.i.address]) {
+    //                   map.data.forEach(element => {
+    //                     if (element.i['address'] == map_data.feature.i['address']) {
+    //                       map.data.remove(element);
+    //                       map.data.remove(map_data.feature);
+    //                       delete all_data[map_data.feature.i.address];
+    //                     }
+
+    //                   });
+
+    //                 }
+    //               })
+    //               data_coords = []
+    //             }
+    //           }
+
+
+    //           break
+
+    //         }
+    //         else if (data[j].geojson.type == "Polygon") {
+    //           get_coords(data[j].geojson.coordinates)
+    //           var data_geo = {
+    //             type: "Feature",
+    //             "properties": {
+    //               'address': address
+    //             },
+    //             geometry: {
+    //               "type": "Polygon",
+
+    //               "coordinates": [data_coords]
+    //             }
+    //           };
+    //           all_data[address] = data_coords
+    //           map.data.addGeoJson(data_geo)
+    //           let map_data = []
+    //           map.data.addListener('click', function (event) {
+
+    //             map_data = event
+    //             map.data.forEach(element => {
+    //               if (element.i.address === event.feature.i.address) {
+    //                 map.data.overrideStyle(element, {
+    //                   fillColor: 'red',
+    //                   strokeColor: 'red'
+    //                 });
+    //               }
+    //               else {
+    //                 map.data.overrideStyle(element, {
+    //                   fillColor: 'black',
+    //                   strokeColor: 'black'
+    //                 })
+    //               }
+
+    //             });
+    //           });
+
+
+
+    //           document.getElementById('delete-button').addEventListener('click', () => {
+    //             if (all_data[map_data.feature.i.address]) {
+    //               map.data.remove(map_data.feature);
+    //               delete all_data[map_data.feature.i.address];
+    //             }
+    //           })
+    //           break
+    //         }
+    //       }
+    //     });
+    // }
+    let addresses = [];
+    searchBox.addListener("places_changed", () => {
+      const places = searchBox.getPlaces();
+      var address = places[0].formatted_address
+      var json_address = address.replace(/[^A-Z0-9]+/ig, "+");
+      var location = places[0].geometry.location;
+      var lat = location.lat()
+      var lng = location.lng()
+      // placeRequest(`https://nominatim.openstreetmap.org/search.php?q=${json_address}&polygon_geojson=1&format=json`, address, addresses)
+      document.getElementsByName('1-name')[0].value = address
+      document.getElementsByName('1-latitude')[0].value = lat
+      document.getElementsByName('1-longitude')[0].value = lng
+      map.data.forEach(function (feature) {
+        // If you want, check here for some constraints.
+
+      });
+      if (places.length == 0) {
+        return;
+      }
+      // Clear out the old markers.
+      markers.forEach((marker) => {
+        marker.setMap(null);
+      });
+      markers = [];
+
+      // For each place, get the icon, name and location.
+      const bounds = new google.maps.LatLngBounds();
+      places.forEach((place) => {
+        if (!place.geometry || !place.geometry.location) {
+          return;
+        }
+        const icon = {
+          url: place.icon,
+          size: new google.maps.Size(71, 71),
+          origin: new google.maps.Point(0, 0),
+          anchor: new google.maps.Point(17, 34),
+          scaledSize: new google.maps.Size(25, 25),
+        };
+        // Create a marker for each place.
+        markers.push(
+          new google.maps.Marker({
+            map,
+            icon,
+            title: place.name,
+            position: place.geometry.location,
+          })
+        );
+
+        if (place.geometry.viewport) {
+          // Only geocodes have viewport.
+          bounds.union(place.geometry.viewport);
+        } else {
+          bounds.extend(place.geometry.location);
+        }
+      });
+      map.fitBounds(bounds);
+    });
+
+    google.maps.event.addListener(map, 'click', function (event) {
+      geocoder.geocode({
+        'latLng': event.latLng
+      }, function (results, status) {
+        if (status == google.maps.GeocoderStatus.OK) {
+          if (results[0]) {
+            document.getElementsByName('1-name')[0].value = results[0].formatted_address;
+
+          }
+        }
+      });
+    });
+
+
+let markerArray = []
+let selectedMarker = []
+let deleteMarkers =[]
+let markerNames = []
+// Add Marker by click
+
+// document.getElementById("plus-marker").addEventListener('click', function (e){
+//   map.setCenter({lat:  39.00008749314287, lng: -91.99992945503925});
+//   var marker = new google.maps.Marker({
+//      position: {lat:  39.00008749314287, lng: -91.99992945503925},
+//      map: map,
+//      draggable: true,
+//  });
+//   document.getElementsByName('1-name')[0].value = '2222+22 Hatton, MO, USA';
+//   document.getElementsByName('1-latitude')[0].value = parseFloat(39.00008749314287);
+//   document.getElementsByName('1-longitude')[0].value = parseFloat(-91.99992945503925);
+//   markerArray.push([39.00008749314287, -91.99992945503925])
+//   markerNames.push('2222+22 Hatton, MO, USA')
+//   let stringData = JSON.stringify(markerArray) ;
+//   document.getElementsByName('1-multy_markers')[0].value = stringData;
+//   let stringNameData = JSON.stringify(markerNames) ;
+//   document.getElementsByName('1-location_names')[0].value = stringNameData;
+  
+  
+//   geocoder.geocode({
+//   'latLng': { lat:  39.00008749314287,  lng:-91.99993481945717 }
+//     }, function (results, status) {
+//       if (status == google.maps.GeocoderStatus.OK) {
+//         if (results[0]) {
+//           console.log(results[0].formatted_address);
+//         }}})
+
+
+//  google.maps.event.addListener(marker, "dragstart", function (e) {
+//     console.log(e.latLng.lat(), e.latLng.lng());
+//     deleteMarkers = []
+//     deleteMarkers.push(marker) 
+//     selectedMarker = []
+//     selectedMarker.push(e.latLng.lat(), e.latLng.lng())
+//     for(i in markerArray){
+//       if(markerArray[i][0] == selectedMarker[0] && markerArray[i][1] == selectedMarker[1]){
+//         markerArray.splice(i, 1)
+//       }
+//     }
+//   geocoder.geocode({
+//   'latLng': deleteMarkers[0].position
+//     }, function (results, status) {
+//       if (status == google.maps.GeocoderStatus.OK) {
+//         if (results[0]) {
+//           for(i in markerNames){
+//             if(markerNames[i]==results[0].formatted_address){
+//               markerNames.splice(i, 1)
+//               let stringData = JSON.stringify(markerArray) ;
+//               document.getElementsByName('1-multy_markers')[0].value = stringData;
+//               let stringNameData = JSON.stringify(markerNames) ;
+//               document.getElementsByName('1-location_names')[0].value = stringNameData;
+//               if (markerArray.length==0 && markerNames.length==0){
+//                 document.getElementsByName('1-latitude')[0].value = '';
+//                 document.getElementsByName('1-longitude')[0].value = '';
+//                 document.getElementsByName('1-name')[0].value = '';
+//                 document.getElementsByName('1-location_names')[0].value = '';
+//                 document.getElementsByName('1-multy_markers')[0].value = '';
+//               }
+//               else{
+//                 document.getElementsByName('1-name')[0].value = markerNames[0];
+//                 document.getElementsByName('1-latitude')[0].value = parseFloat(markerArray[0][0]);
+//                 document.getElementsByName('1-longitude')[0].value = parseFloat(markerArray[0][1]);
+  
+//               }
+
+//             }
+//           }
+//         }
+//       }                   
+//     });
+
+//  })
+
+//     google.maps.event.addListener(marker, "dragend", function (e) {
+
+//       console.log(e.latLng.lat(), e.latLng.lng() );
+//       markerArray.push([e.latLng.lat(), e.latLng.lng()])
+//       geocoder.geocode({
+//         'latLng': e.latLng
+//             }, function (results, status) {
+//               console.log('status',  status);
+//             if (status == google.maps.GeocoderStatus.OK) {
+//               if (results[0]) {
+//                 console.log(results[0].formatted_address);
+//                 markerNames.push(results[0].formatted_address)
+//                 let stringData = JSON.stringify(markerArray) 
+//                 document.getElementsByName('1-multy_markers')[0].value = stringData
+//                 let stringNameData = JSON.stringify(markerNames) 
+//                 document.getElementsByName('1-location_names')[0].value = stringNameData
+//                 if (markerArray.length==0 && markerNames.length==0){
+//                 document.getElementsByName('1-latitude')[0].value = '';
+//                 document.getElementsByName('1-longitude')[0].value = '';
+//                 document.getElementsByName('1-name')[0].value = '';
+//                 document.getElementsByName('1-location_names')[0].value = '';
+//                 document.getElementsByName('1-multy_markers')[0].value = '';
+//               }
+//               else{
+//                 document.getElementsByName('1-name')[0].value = results[0].formatted_address;
+//                 document.getElementsByName('1-latitude')[0].value = parseFloat(e.latLng.lat());
+//                 document.getElementsByName('1-longitude')[0].value = parseFloat(e.latLng.lng());
+  
+//               }
+//         }
+//       }       
+//     });
+//     })
+
+//  google.maps.event.addListener(marker, "click", function (e) {
+          
+// console.log(markerNames);
+//           var infoWindow = new google.maps.InfoWindow({
+//               content: 'Latitude: ' + e.latLng.lat() + '<br />Longitude: ' + e.latLng.lng()
+//           });
+//           infoWindow.open(map, marker);
+//           deleteMarkers = []
+//           deleteMarkers.push(marker) 
+//           selectedMarker = []
+//           selectedMarker.push(e.latLng.lat(), e.latLng.lng())
+//       });
+
+
+// })
+
+
+google.maps.event.addListener(map, 'click', function (e) {
+ 
+ //Determine the location where the user has clicked.
+ var location = e.latLng;
+
+ //Create a marker and placed it on the map.
+ var marker = new google.maps.Marker({
+     position: location,
+     map: map
+ });
+markerArray.push([location.lat(), location.lng()])
+geocoder.geocode({
+  'latLng': e.latLng
+      }, function (results, status) {
+        console.log('status',  status);
+      if (status == google.maps.GeocoderStatus.OK) {
+        if (results[0]) {
+          console.log(results[0].formatted_address);
+          markerNames.push(results[0].formatted_address)
+          let stringData = JSON.stringify(markerArray) 
+          document.getElementsByName('1-multy_markers')[0].value = stringData
+          let stringNameData = JSON.stringify(markerNames) 
+          document.getElementsByName('1-location_names')[0].value = stringNameData
+        }
+      }       
+    });
+
+
+//Add marker
+ google.maps.event.addListener(marker, "click", function (e) {
+          
+console.log(markerNames);
+          var infoWindow = new google.maps.InfoWindow({
+              content: 'Latitude: ' + location.lat() + '<br />Longitude: ' + location.lng()
+          });
+          infoWindow.open(map, marker);
+          deleteMarkers = []
+          deleteMarkers.push(marker) 
+          selectedMarker = []
+          selectedMarker.push(location.lat(), location.lng())
+      });
+
+});
+
+
+
+let multyMark = document.getElementsByName('1-multy_markers')[0].value
+let locationName = document.getElementsByName('1-location_names')[0].value
+//delete selected marker
+document.getElementById('delete-marker-button').addEventListener('click', ()=>{
+console.log(markerArray);
+  for(i in markerArray){
+    if(markerArray[i][0] == selectedMarker[0] && markerArray[i][1] == selectedMarker[1]){
+      markerArray.splice(i, 1)
+    }
+  }
+  geocoder.geocode({
+  'latLng': deleteMarkers[0].position
+    }, function (results, status) {
+      if (status == google.maps.GeocoderStatus.OK) {
+        if (results[0]) {
+          for(i in markerNames){
+            if(markerNames[i]==results[0].formatted_address){
+              markerNames.splice(i, 1)
+              let stringData = JSON.stringify(markerArray) ;
+              document.getElementsByName('1-multy_markers')[0].value = stringData;
+              let stringNameData = JSON.stringify(markerNames) ;
+              document.getElementsByName('1-location_names')[0].value = stringNameData;
+              if (markerArray.length==0 && markerNames.length==0){
+                document.getElementsByName('1-latitude')[0].value = '';
+                document.getElementsByName('1-longitude')[0].value = '';
+                document.getElementsByName('1-name')[0].value = '';
+                document.getElementsByName('1-location_names')[0].value = '';
+                document.getElementsByName('1-multy_markers')[0].value = '';
+              }
+              else{
+                document.getElementsByName('1-name')[0].value = markerNames[0];
+                document.getElementsByName('1-latitude')[0].value = parseFloat(markerArray[0][0]);
+                document.getElementsByName('1-longitude')[0].value = parseFloat(markerArray[0][1]);
+              }
+            }
+          }
+        }
+      }
+  console.log('aqweqwew', markerNames);    
+                         
+    });
+deleteMarkers[0].setMap(null);
+console.log(multyMark);
+})
+
+
+
+google.maps.event.addDomListener(map, "click", function (e) {
+  console.log(multyMark);
+  infoWindow = new google.maps.InfoWindow({
+    position: e.latLng.toJSON(),
+  });
+  document.getElementsByName('1-latitude')[0].value = parseFloat(infoWindow.position.lat());
+  document.getElementsByName('1-longitude')[0].value = parseFloat(infoWindow.position.lng());
+
+  var latlng = new google.maps.LatLng(infoWindow.position.lat(), infoWindow.position.lng());
+
+});
+    
+
+
+    map.controls[google.maps.ControlPosition.RIGHT_BOTTOM]
+      .push(document.getElementById('save-button'));
+    // map.controls[google.maps.ControlPosition.RIGHT_BOTTOM]
+    //   .push(document.getElementById('delete-button'));
+    map.controls[google.maps.ControlPosition.RIGHT_BOTTOM]
+      .push(document.getElementById('delete-marker-button'));    
+    map.controls[google.maps.ControlPosition.RIGHT_BOTTOM]
+      .push(document.getElementById('plus_marker'));
+
+
+    var polyOptions = {
+      strokeWeight: 3,
+      fillOpacity: 0.2
+    };
+
+
+
+
+
+    var shapes = {
+      collection: {},
+      selectedShape: null,
+      add: function (e) {
+        var shape = e.overlay,
+          that = this;
+        shape.type = e.type;
+        shape.id = new Date().getTime() + '_' + Math.floor(Math.random() * 1000);
+        this.collection[shape.id] = shape;
+        this.setSelection(shape);
+        google.maps.event.addListener(shape, 'click', function () {
+          that.setSelection(this);
+        });
+      },
+      setSelection: function (shape) {
+        if (this.selectedShape !== shape) {
+          this.clearSelection();
+          this.selectedShape = shape;
+          shape.set('draggable', true);
+          shape.set('editable', true);
+        }
+      },
+      deleteSelected: function () {
+
+        if (this.selectedShape) {
+          var shape = this.selectedShape;
+          this.clearSelection();
+          shape.setMap(null);
+          delete this.collection[shape.id];
+        }
+      },
+
+
+      clearSelection: function () {
+        if (this.selectedShape) {
+          this.selectedShape.set('draggable', false);
+          this.selectedShape.set('editable', false);
+          this.selectedShape = null;
+        }
+      },
+      save: function () {
+        var collection = [];
+        for (var k in this.collection) {
+          var shape = this.collection[k],
+            types = google.maps.drawing.OverlayType;
+          switch (shape.type) {
+            case types.POLYGON:
+              collection.push({
+                type: shape.type,
+                latLng: shape.getPath().getArray().map(coord => {
+                  return {
+                    lat: coord.lat(),
+                    lng: coord.lng()
+                  }
+                }),
+                path: google.maps.geometry.encoding
+                  .encodePath(shape.getPath()),
+                position: shape
+              });
+              break;
+          }
+        }
+        //collection is the result
+        let a = []
+        let b = []
+        let c = []
+        let e = []
+        document.getElementsByName('1-polygon_data')[0].value = ''
+        for (i in collection) {
+          collection[i].latLng.forEach(element => {
+            b.push(Object.values(element))
+            c.push(element)
+
+          })
+
+          a.push(b)
+          b = []
+          e.push(c)
+        }
+        localStorage.setItem('polygon', JSON.stringify(e))
+
+        let all_values = []
+        let values = document.getElementsByName('1-polygon_data')[0].value
+        if (Object.keys(all_data).length != 0 && a.length == 0) {
+          all_values.push(Object.values(all_data))
+        }
+        else if (a.length != 0 && Object.keys(all_data).length == 0) {
+          all_values.push(a)
+        }
+        else if (a.length != 0 && Object.keys(all_data).length != 0) {
+          all_values.push(Object.values(all_data))
+          all_values.push(a)
+        }
+        else {
+          all_values = []
+        }
+        let input_values = document.getElementsByName('1-polygon_data')[0].value
+        addresses = []
+        for (let i = 0; i < Object.keys(all_data).length; i++) {
+          addresses.push(Object.keys(all_data)[i] + ';')
+        }
+
+        localStorage.setItem('place', addresses)
+        if (all_values.length != 0) {
+          if (input_values == '') {
+            let area = document.getElementsByName('1-polygon_data')[0]
+            area.value = JSON.stringify(all_values)
+          }
+          else {
+            astring = JSON.stringify(all_values)
+            let all = input_values.substring(0, input_values.length - 1) + ',' + astring.substring(1)
+            document.getElementsByName('1-polygon_data')[0].value = all;
+          }
+        }
+
+      }
+
+    };
+    // IF in localStorage save the country, get request
+    if (localStorage.getItem('place')) {
+      let add = localStorage.getItem('place');
+      let addArray = add.split(';,');
+      for (let i = 0; i < addArray.length; i++) {
+        var json_address = addArray[i].replace(/[^A-Z0-9]+/ig, "+");
+        if (json_address.slice(-1) === '+') {
+          json_address = json_address.slice(0, json_address.length - 1);
+        }
+        placeRequest(`https://nominatim.openstreetmap.org/search.php?q=${json_address}&polygon_geojson=1&format=json`, add[i])
+        setTimeout(0.5)
+      }
+    }
+
+    if (localStorage.getItem('polygon')) {
+
+      let storage_polygon_data = localStorage.getItem('polygon')
+      let polygons = JSON.parse(storage_polygon_data)
+      let latlngArray = []
+      for (i in polygons) {
+        var newPolygon = new google.maps.Polygon({
+          paths: polygons[i],
+          strokeWeight: 3,
+          fillOpacity: 0.2,
+
+        });
+      }
+      newPolygon.setMap(map);
+    }
+    // Drawing Manager
+    // var drawingManager = new google.maps.drawing.DrawingManager({
+    //   drawingControl: true,
+    //   drawingControlOptions: {
+    //     position: google.maps.ControlPosition.TOP_RIGHT,
+    //     drawingModes: [
+    //       google.maps.drawing.OverlayType.POLYGON,]
+    //   },
+    //   polygonOptions: polyOptions,
+    //   map: map
+    // });
+
+
+
+    google.maps.event.addListener(drawingManager, 'overlaycomplete', function (e) {
+      drawingManager.setDrawingMode(null);
+      shapes.add(e);
+
+    });
+
+
+
+    google.maps.event.addListener(drawingManager,
+      'drawingmode_changed',
+      function () {
+        shapes.clearSelection();
+      });
+    google.maps.event.addListener(map,
+      'click',
+      function () { shapes.clearSelection(); });
+    google.maps.event.addDomListener(document.getElementById('delete-button'), 'click',
+      function () { shapes.deleteSelected(); });
+    google.maps.event.addDomListener(document.getElementById('save-button'), 'click',function () {
+       shapes.save(); 
+      });
+
+
+    var polygon_data = document.getElementById('id_1-polygon_data');
+
+    // var data_geo = {
+    //                 type: "Feature",
+    //                 "properties": {
+    //                 },
+    //                 geometry: {
+    //                   "type": "Polygon",
+    //                   "coordinates": polygonArray
+    //                 }
+    //               };
+    // map.data.addGeoJson(data_geo);
+    // console.log(document.getElementById('id_1-polygon_data').value);
+
+  }
+
+
+</script>
+{% endif %}

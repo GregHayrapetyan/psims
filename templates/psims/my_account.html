@@ -1,0 +1,216 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Page Blank {% endblock %}
+{% block content %}
+<style>
+  .main {
+    margin-top: 25px;
+    margin-left: 25px;
+    display: flex;
+  }
+
+  .user_info {
+    margin-top: 25px;
+    margin-left: 25px;
+  }
+
+  .list-group-item {
+    max-width: 450px;
+  }
+
+  .popup {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    padding-top: 45px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(255, 255, 255);
+    background-color: rgba(255, 255, 255, 0.4);
+  }
+
+  .popup-content {
+    position: relative;
+    background-color: #fefefe;
+    margin: auto;
+    padding: 0;
+    border-radius: 10px;
+    width: 50%;
+    box-shadow: 0 4px 8px 0 rgba(62, 177, 253, 0.2), 0 6px 20px 0 rgba(157, 166, 243, 0.19);
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s
+  }
+
+  @-webkit-keyframes animatetop {
+    from {
+      top: -300px;
+      opacity: 0
+    }
+
+    to {
+      top: 0;
+      opacity: 1
+    }
+  }
+
+  @keyframes animatetop {
+    from {
+      top: -300px;
+      opacity: 0
+    }
+
+    to {
+      top: 0;
+      opacity: 1
+    }
+  }
+
+  .close {
+    float: right !important;
+    font-size: 2.5rem !important;
+    font-weight: 400 !important;
+    line-height: 0.5 !important;
+    color: #1db6f1 !important;
+    text-shadow: 0 1px 0 #fff !important;
+    opacity: 0.5 !important;
+  }
+
+  .close:hover,
+  .close:focus {
+    color: rgb(255, 255, 255);
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .popup-header {
+    padding: 10px 10px;
+    background-color: #ffffff;
+    color: white;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+  }
+
+  .header_text {
+    padding-top: 10px;
+    margin-bottom: 0rem;
+    font-size: 30px;
+    color: rgba(0, 148, 247, 0.438);
+    margin-left: 26%;
+  }
+
+  .popup-body {
+    padding: 2px 16px;
+  }
+
+  .edit_input {
+    border-radius: 5px;
+    border: none;
+    box-shadow: 0 4px 8px 0 rgba(62, 177, 253, 0.2), 0 6px 20px 0 rgba(157, 166, 243, 0.19);
+    width: 300px;
+    height: 40px;
+    padding: 10px;
+    padding-bottom: 10px;
+    margin-top: 10px;
+  }
+</style>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+  integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+
+<ul class="list-group list-group-flush">
+  <li class="list-group-item edit-name">Username:{{ request.user.username }}</li>
+  <li class="list-group-item edit-email">Email:{% if request.user.email %} {{ request.user.email }}{% else %}{% endif %}</li>
+  <li class="list-group-item">First Name:{% if request.user.first_name %} {{ request.user.first_name }}{% else %}{% endif %}</li>
+  <li class="list-group-item">Last Name:{% if request.user.last_name %} {{ request.user.last_name }}{% else %}{% endif %}</li>
+  <li class="list-group-item">Company:{% if request.user.profile.company %} {{ request.user.profile.company }}{% else %}{% endif %}</li>
+  <li class="list-group-item">Title:{% if request.user.profile.title %} {{ request.user.profile.title }}{% else %}{% endif %}</li>
+  <li class="list-group-item">Phone number:{% if request.user.profile.phone_number %} {{ request.user.profile.phone_number }}{% else %}{% endif %}</li>
+  <li class="list-group-item">Crops/Regions:{% if request.user.profile.crops_regions %} {{ request.user.profile.crops_regions }}{% else %}{% endif %}</li>
+  <li class="list-group-item">Last login: {{ request.user.last_login }}</li>
+  <li class="list-group-item">Date joined: {{ request.user.date_joined }}</li>
+  <li class="list-group-item">Number of your jobs: {{count}} </li>
+</ul>
+<div id="mypopup" class="popup">
+  <div class="popup-content">
+    <div class="popup-header">
+      <span class="close">&times;</span>
+      <p class="header_text">Edit Profile Information</p>
+
+    </div>
+    <div class="popup-body" style="text-align: center;padding: 10px;">
+      <form id="reg_form" method="POST">
+        <input type="input" class="edit_input" name="username" id="username" value="{{ request.user.username }}"
+          placeholder="Username"><br>
+        <input type="input" class="edit_input" name="email" value="{{ request.user.email }}" placeholder="Email"><br>
+        <input type="input" class="edit_input" name="first_name" value="{{ request.user.first_name }}"
+          placeholder="First Name"><br>
+        <input type="input" class="edit_input" name="last_name" value="{{ request.user.last_name }}"
+          placeholder="Last Name"><br>
+        <input type="input" class="edit_input" name="company" value="{{ request.user.profile.company }}"
+          placeholder="Company"><br>
+        <input type="input" class="edit_input" name="title" value="{{ request.user.profile.title }}"
+          placeholder="Title"><br>
+        <input type="input" class="edit_input" name="phone_number" value="{{ request.user.profile.phone_number }}"
+          placeholder="Phone number"><br>
+        <input type="input" class="edit_input" name="crops_regions" value="{{ request.user.profile.crops_regions }}"
+          placeholder="Crops/Regions"><br>
+        <br>
+        <input type="submit" id="sub" style="background-color: rgba(0, 148, 247, 0.733); border: none; width: 80px;"
+          class="btn btn-info sub" value="Edit">
+      </form>
+    </div>
+
+  </div>
+
+</div>
+
+
+<div class="main">
+  <button type="submit" class="btn btn-info" id="edit"> Edit </button>
+  <form method="get" action="/auth-reset-pass.html" style="margin-bottom: 0px;">
+    <button type="submit" class="btn btn-info"> Reset Password</button>
+  </form>
+</div>
+<script>
+  var exist = {% if exist %}true{% else %} false{% endif %}
+  if (exist) {
+    alert('Username exist')
+  }
+
+  document.getElementById('sub').addEventListener('click', (e) => {
+    var username = document.getElementById("username").value;
+
+    console.log(e.key);
+
+    if (username.length == 0) {
+      e.preventDefault()
+      alert('Please enter name')
+    }
+
+  }
+  )
+
+
+  var popup = document.getElementById("mypopup");
+  var btn = document.getElementById("edit");
+  var span = document.getElementsByClassName("close")[0];
+  btn.onclick = function () {
+    popup.style.display = "block";
+  }
+
+  span.onclick = function () {
+    popup.style.display = "none";
+  }
+
+  window.onclick = function (event) {
+    if (event.target == popup) {
+      popup.style.display = "none";
+    }
+  }
+</script>
+{% endblock %}

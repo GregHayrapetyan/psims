@@ -1,0 +1,409 @@
+{% extends "layouts/base.html" %}
+{% load i18n %}
+
+{% block title %} Praedictus Modeling Tool {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}
+        <link rel="stylesheet" href="/static/psims/css/local.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+        
+        {% if wizard.steps.step1 == 4 %}
+        <script>
+            
+            var datepicker_start = '{{planting_date}}'
+
+        </script>
+        {% endif %}
+
+
+
+{% endblock stylesheets %}
+{% block content %}
+<style>
+    .gm-style-moc {
+  display: none;
+}
+.form-group {
+    margin-bottom: 0rem !important;
+}
+</style>
+<form class= "form-group"  action="" method="post">
+     {% csrf_token %}
+     {{ wizard.management_form }}
+
+    <div class="pcoded-content">
+        <div class="pcoded-inner-content">
+            <!-- [ breadcrumb ] start -->
+            <div class="page-header">
+                <div class="page-block">
+                    <div class="row align-items-center">
+                        <div class="col-md-12">
+                            <div class="page-header-title">
+                                <h5 class="m-b-10">Praedictus Yield Lab</h5>
+                                
+                            </div>
+                            <ul class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a></li>
+                                <li class="breadcrumb-item"><a href="javascript:">{% if success %}Processing...{% else %}Step {{ wizard.steps.step1 }} of {{ wizard.steps.count }}{% endif %}</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- [ breadcrumb ] end -->
+
+            <div class="main-body">
+                <div class="page-wrapper">
+                    <!-- [ Main Content ] start -->
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card">
+{#                                <div class="card-header">#}
+{#                                    <h5>Praedictus Yield Lab</h5>#}
+{#                                </div>#}
+                                <div class="card-block">
+                                    {% if success %}
+                                    <span class='success_message' id="message" style="font-size: 20px;">Your crop is being processed, please wait...</span>
+                                    {% else %}
+                                    
+                                    <div class="form-group">
+                                        
+                                        {% if wizard.form.forms %}
+                                            {{ wizard.form.management_form }}
+                                            {% for form in wizard.form.forms %}
+                                                <div class="form-control">
+                                                    <input type="hidden" id="first-value" />
+                                                {{ form }}
+                                                </div>
+                                            {% endfor %}
+                                        {% else %}
+                                        
+                                        <input type="hidden" id="first-value" />
+                                            {{ wizard.form }}
+                                        {% endif %}
+
+                                        <br>
+                                        <br>
+                                        {% if wizard.steps.prev %}
+                                            <button id="wizard_button" name="wizard_goto_step" class="btn btn-primary mb-2" style="width: 98px; height: 42px" 
+                                                type="submit"  value="{{ wizard.steps.prev }}">
+                                                {% trans "Previous" %}
+                                            </button>
+                                        {% endif %}
+                                        {% if wizard.steps.last %}
+                                            <input class="btn btn-primary mb-2" onClick="reply_click(this.id)" id="but_next" style="width: 98px; height: 42px" type="submit" value="Next"/>
+                                        {%  else %}
+                                            <input class="btn btn-primary mb-2" id="but_next" style="width: 98px; height: 42px" type="submit" value="Submit"/>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- [ Main Content ] end -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+     </form>
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+{% if success %}
+<script>    
+
+    const startTime = new Date()
+    maxWaitingTime = 32000000 // 2 min.
+    const interval = setInterval(() => {
+        fetch('/api/check-status/')
+            .then(response => response.json())
+            .then(data => {
+                if(data.completed) {
+                    $(".pcoded-wrapper").prepend(`<div class="alert alert-success alert-dismissible">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong>Success!</strong> Your {{ location_name }}, {{ crop_name }} crop is complete. View in <a href="/{{ user }}/results/${data.completed_worker_id}"> My Yield Indices </a>now.
+            </div>`)
+                    document.getElementById('message').innerHTML = `Your {{ location_name }}, {{ crop_name }} crop has been planted <br> Your results will be ready shortly here:<a href="/{{ user }}/results/${data.completed_worker_id}"> My Yield Indices </a> Planting date {{ planting_date }}, Fertilizer date {{ fertilizer_date }}`;
+
+                    clearInterval(interval)
+
+
+                }else if(new Date() - startTime > maxWaitingTime) clearInterval(interval)
+            })
+
+    }, 1500)
+</script>>{% endif %}
+{% if wizard.steps.step1 == 1 %}
+<script>
+
+nextButton = document.getElementById('but_next')
+nextButton.style.display = 'none';
+
+
+document.querySelectorAll('.crops-item').forEach((element) =>{
+    element.addEventListener('click', ()=>{
+        nextButton.click();
+    })
+})
+
+// nextButton.click();
+</script>
+{% endif %}
+
+{% if wizard.steps.step1 == 3 %}
+
+    
+<script>
+     let corn_name = '{{crop}}'
+    if(corn_name == 'Corn')
+    {
+        document.getElementById("id_2-plplp").value = 8
+        document.getElementById("id_2-plpop").value = 8
+        document.getElementById("id_2-plpoe").value = 8
+    }
+    else if(corn_name == 'Soybean' || corn_name == 'Hemp'){
+        document.getElementById("id_2-plplp").value = 45
+        document.getElementById("id_2-plpop").value = 45
+        document.getElementById("id_2-plpoe").value = 45
+    }
+    else if(corn_name == 'Spring Wheat' || corn_name == 'Winter Wheat'){
+        document.getElementById("id_2-plplp").value = 275
+        document.getElementById("id_2-plpop").value = 275
+        document.getElementById("id_2-plpoe").value = 275
+    }
+    else if(corn_name == 'Canola'){
+        document.getElementById("id_2-plplp").value = 85
+        document.getElementById("id_2-plpop").value = 85
+        document.getElementById("id_2-plpoe").value = 85
+    }
+    else if(corn_name == 'Chickpea'){
+        document.getElementById("id_2-plplp").value = 35
+        document.getElementById("id_2-plpop").value = 35
+        document.getElementById("id_2-plpoe").value = 35
+    }
+    else if(corn_name == 'Barley'){
+        document.getElementById("id_2-plplp").value = 150
+        document.getElementById("id_2-plpop").value = 150
+        document.getElementById("id_2-plpoe").value = 150
+    }
+    else{
+        document.getElementById("id_2-plplp").value = 10
+        document.getElementById("id_2-plpop").value = 10
+        document.getElementById("id_2-plpoe").value = 10
+    }
+    var pldp = document.getElementById('id_2-pldp');
+    var plrs = document.getElementById('id_2-plrs');
+    var plpop = document.getElementById('id_2-plpop');
+    var plpoe = document.getElementById('id_2-plpoe');
+    var add_planting_dates = document.getElementById('id_2-add_planting_dates');
+    var pldp = document.getElementById('id_2-pldp');
+    var plrs = document.getElementById('id_2-plrs');
+    var plpop = document.getElementById('id_2-plpop');
+    var plpoe = document.getElementById('id_2-plpoe');
+    var add_planting_dates = document.getElementById('id_2-add_planting_dates');
+
+// hide
+pldp.style.display = 'none';
+plrs.style.display = 'none';
+plpop.style.display = 'none';
+plpoe.style.display = 'none';
+add_planting_dates.style.display = 'none';
+var labelElements = pldp.labels;
+labelElements[0].style.display = 'none';
+var labelElements1 = plrs.labels;
+labelElements1[0].style.display = 'none';
+var labelElements2 = plpop.labels;
+labelElements2[0].style.display = 'none';
+var labelElements3 = plpoe.labels;
+labelElements3[0].style.display = 'none';
+var labelElements4 = add_planting_dates.labels;
+labelElements4[0].style.display = 'none';
+
+// let advanced = `
+//     <a href="" id="advanced" class="advanced">Advanced</a>
+//     `
+// document.getElementById('id_3-plplp').insertAdjacentHTML('afterEnd', advanced)
+// document.getElementById('advanced').insertAdjacentHTML('afterEnd', '<br><br>')
+// document.getElementById('advanced').addEventListener('click', (e)=>{
+//     e.preventDefault()
+// if(pldp.style.display == 'none'){
+    
+//     pldp.style.display = 'block';
+// plrs.style.display = 'block';
+
+// plpoe.style.display = 'block';
+// var labelElements = pldp.labels;
+// labelElements[0].style.display = 'block';
+// var labelElements1 = plrs.labels;
+// labelElements1[0].style.display = 'block';
+
+// var labelElements3 = plpoe.labels;
+// labelElements3[0].style.display = 'block';
+
+// }else{
+//     pldp.style.display = 'none';
+// plrs.style.display = 'none';
+// plpop.style.display = 'none';
+// plpoe.style.display = 'none';
+// var labelElements = pldp.labels;
+// labelElements[0].style.display = 'none';
+// var labelElements1 = plrs.labels;
+// labelElements1[0].style.display = 'none';
+// var labelElements3 = plpoe.labels;
+// labelElements3[0].style.display = 'none';
+// }
+
+// })
+</script>
+
+{% endif %}
+
+
+{% if wizard.steps.step1 == 3 %}
+<script>
+    first = '{{plpop}}'
+    second = '{{plpoe}}'
+    planting = '{{plplp}}'
+    t = document.getElementById("id_2-plpop")
+    t1 = document.getElementById("id_2-plpoe")
+    document.getElementById("id_2-plplp").addEventListener("input", function(){
+    document.getElementById("id_2-plpop").value = this.value;
+});
+document.getElementById("id_2-plplp").addEventListener("input", function(){
+document.getElementById("id_2-plpoe").value = this.value;
+});
+    if(planting){
+        document.getElementById("id_2-plpop").value = planting
+        document.getElementById("id_2-plpoe").value = planting
+    }
+    else{
+        console.log('not exist');
+    }
+</script>
+{% endif %}
+{% if wizard.steps.step1 == 3 %}
+<script>
+let crop = '{{crop}}'
+let date = new Date()
+console.log('sdffdsf', new Date());
+
+if (crop == 'Hemp'){
+    p = dayFromDate(date) - 1
+}
+else{
+    p = '{{func_planting_date}}'
+}
+document.getElementById('pd').value = p
+console.log('pppppppppppppppp', p);
+console.log('errorororor', '{{error}}');
+let radio = `
+<div style="display:block;" id="scales"> 
+  <label for="era" style="display:flex;">
+    <input type="radio" id="era" name="weather"  value="ERA-5" style="width: 15px; height: 20px; margin: 0; margin-right: 8px;">
+    ERA-5</label>
+  <label for="prism" style="display:flex;">
+    <input type="radio" id="prism" name="weather" value="PRISM" style="width: 15px; height: 20px; margin: 0; margin-right: 8px;">
+    PRISM</label>
+</div >
+    `
+    document.getElementById('id_2-iame').insertAdjacentHTML('afterEnd', radio);
+</script>
+{% endif %}
+{% if wizard.steps.step1 == 2 %}
+<script>
+    document.addEventListener('keypress', function (e) {
+        (e.keyCode === 13 || e.which === 13) && e.preventDefault()
+    });
+var polygon_data = document.getElementById('id_1-polygon_data');
+
+var multy_markers = document.getElementById('id_1-multy_markers');
+var multy_markers_names = document.getElementById('id_1-location_names');
+polygon_data.style.display = 'none';
+multy_markers.style.display = 'none';
+multy_markers_names.style.display = 'none';
+var labelElements = polygon_data.labels;
+var labelElements1 = multy_markers.labels;
+var labelElements2 = multy_markers_names.labels;
+labelElements[0].style.display = 'none';
+labelElements1[0].style.display = 'none';
+labelElements2[0].style.display = 'none';
+</script>
+{% endif %}
+{% if wizard.steps.step1 == 3 %}
+<script>
+// method.style.display = 'none';
+var labelElements = method.labels;
+labelElements[0].style.display = 'none';
+</script>
+{% endif %}
+
+{% if wizard.steps.step1 == 4 %}
+<script>
+var method = document.getElementById('id_2-iame');
+var fertilizer_application = document.getElementById('id_3-fedep');
+var fertilizer_method = document.getElementById('id_3-feacd');
+var fertilizer_type = document.getElementById('id_3-fecd');
+var img_wrapper = document.getElementById('img-wrapper');
+var img_label = document.getElementById('img-label');
+var labelElements1 = fertilizer_method.labels;
+var labelElements2 = fertilizer_application.labels;
+var labelElements3 = fertilizer_type.labels;
+img_wrapper.style.display = 'none';
+img_label.style.display = 'none';
+fertilizer_application.style.display = 'none';
+labelElements1[0].style.display = 'none';
+fertilizer_method.style.display = 'none';
+labelElements2[0].style.display = 'none';
+fertilizer_type.style.display = 'none';
+labelElements3[0].style.display = 'none';
+let seed = `
+<div style="display:flex" id="scales"> 
+    
+  <input type="checkbox" id="seed" name="seed" style="width: 20px; height: 20px; margin: 0; margin-right: 8px;">
+  <br>
+  <br>
+  <label>Advanced Seed Inputs?</label>
+</div >
+    `
+
+
+
+let advanced = 
+`
+<a href="" id="advanced" class="advanced">Advanced</a>
+`
+
+document.getElementById('id_3-fecd').insertAdjacentHTML('afterEnd', advanced);
+document.getElementById('advanced').insertAdjacentHTML('afterEnd', seed);
+document.getElementById('advanced').insertAdjacentHTML('afterEnd', '<br><br>');
+
+document.getElementById('advanced').addEventListener('click', (e)=>{
+    e.preventDefault()  
+    if(fertilizer_type.style.display  == 'none')
+    {
+        fertilizer_type.style.display = 'block';
+        labelElements3[0].style.display = 'block';
+    }
+    else
+    {
+        fertilizer_type.style.display = 'none';
+        labelElements3[0].style.display = 'none';
+    }
+})
+
+console.log('planting date',  '{{planting_date}}');
+console.log('added planting dates', '{{add_planting_dates}}');
+var p = '{{func_planting_date}}';
+console.log(p);
+document.getElementById('pd').value = p;
+
+
+</script>
+{% endif %}
+
+{% endblock javascripts %}

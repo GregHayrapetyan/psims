@@ -1,0 +1,131 @@
+    {% load static %}
+    <style>
+        .crops-item {
+            padding: 15px;
+            background-color: #FFF;
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+
+        .crops-item:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.3);
+            z-index: 2;
+        }
+
+        .crops-item.selected {
+            box-shadow: 0 0 4px 0 rgb(37, 77, 255);   
+            
+            transform: none;
+            z-index: 1;
+        }
+
+        .crops-img img {
+            width: 55%;
+            max-width: 100px;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .crops-title {
+            text-align: center;
+            margin-top: 20px;
+            width: initial;
+            border: 0;
+        }
+    </style>
+
+    <div id='crop'></div>
+    <input name="{{name}}" id="cr" type="hidden" value="{{value}}" />
+    <div class="row mx-0">
+        <div class="col-12 col-md-3 crops-item" data-id="Barley">
+            <div class="crops-img">
+                <img src="{% static 'psims/img/corn pics/barley.png' %}" alt="Barley">
+            </div>
+            <p class="crops-title">Barley</p>
+        </div>
+        <div class="col-12 col-md-3 crops-item" data-id="Canola">
+            <div class="crops-img">
+                <img src="{% static 'psims/img/corn pics/Canola.png' %}" alt="Canola">
+            </div>
+            <p class="crops-title">Canola</p>
+        </div>
+        <div class="col-12 col-md-3 crops-item" data-id="Chickpea">
+            <div class="crops-img">
+                <img src="{% static 'psims/img/corn pics/Chickpeas.png' %}" alt="Chickpea">
+            </div>
+            <p class="crops-title">Chickpea</p>
+        </div>        
+        <div class="col-12 col-md-3 crops-item" data-id="Corn">
+            <div class="crops-img">
+                <img src="{% static 'psims/img/corn pics/Corn.png' %}" alt="Corn">
+            </div>
+            <p class="crops-title">Corn</p>
+        </div>
+        <div class="col-12 col-md-3 crops-item" data-id="Cotton">
+            <div class="crops-img">
+                <img src="{% static 'psims/img/corn pics//Cotton.png' %}" alt="Cotton">
+            </div>
+            <p class="crops-title">Cotton</p>
+        </div>
+        <div class="col-12 col-md-3 crops-item" data-id="Hemp">
+            <div class="crops-img">
+                <img src="{% static 'psims/img/corn pics/hemp.png' %}" alt="Hemp">
+            </div>
+            <p class="crops-title">Hemp</p>
+        </div>
+        <div class="col-12 col-md-3 crops-item" data-id="Rice">
+            <div class="crops-img">
+                <img src="{% static 'psims/img/corn pics/Rice.png' %}" alt="Rice">
+            </div>
+            <p class="crops-title">Rice</p>
+        </div>
+        <div class="col-12 col-md-3 crops-item" data-id="Sorghum">
+            <div class="crops-img">
+                <img src="{% static 'psims/img/corn pics/Sorghum.png' %}" alt="Sorghum">
+            </div>
+            <p class="crops-title">Sorghum</p>
+        </div>
+        <div class="col-12 col-md-3 crops-item" data-id="Soybean">
+            <div class="crops-img">
+                <img src="{% static 'psims/img/corn pics/Soybean.png' %}" alt="Soybean">
+            </div>
+            <p class="crops-title">Soybean</p>
+        </div>
+        <div class="col-12 col-md-3 crops-item" data-id="Spring Wheat">
+            <div class="crops-img">
+                <img src="{% static 'psims/img/corn pics/Wheat.png' %}" alt="Spring Wheat">
+            </div>
+            <p class="crops-title">Spring Wheat</p>
+        </div>
+        <div class="col-12 col-md-3 crops-item" data-id="Sugarcane">
+            <div class="crops-img">
+                <img src="{% static 'psims/img/corn pics/Sugarcane.png' %}" alt="Sugarcane">
+            </div>
+            <p class="crops-title">Sugarcane</p>
+        </div>
+        <div class="col-12 col-md-3 crops-item" data-id="Winter Wheat">
+            <div class="crops-img">
+                <img src="{% static 'psims/img/corn pics/Winter wheat.png' %}" alt="Winter Wheat">
+            </div>
+            <p class="crops-title">Winter Wheat</p>
+        </div>
+    </div>
+<script>
+
+let crops = document.querySelectorAll(".crops-item");
+crops.forEach(crop => {
+    crop.addEventListener('click',(e) => {
+        for (let i = 0; i < crops.length; i++) {
+            crops[i].classList.remove("selected");
+        }
+        crop.classList.add("selected");
+    corn_name = e.currentTarget.dataset.id;
+    x = document.getElementById("cr")
+    x.value = corn_name
+    console.log(corn_name);
+})
+});
+
+
+</script>

@@ -1,0 +1,439 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Page Blank {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}
+    <link rel="stylesheet" href="/static/assets/plugins/chart-morris/css/morris.css">
+    <link rel="stylesheet" href="/static/assets/plugins/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <style>
+        .live   {
+            margin-top: 63px;
+        }
+    </style>
+{% endblock stylesheets %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+    <script src="/static/assets/plugins/chart-morris/js/raphael.min.js"></script>
+    <script src="/static/assets/plugins/chart-morris/js/morris.min.js"></script>
+
+    <script type="text/javascript">
+
+        var userChoice = "kg"
+        var morrisData = {{ morris_data|safe }};
+        var morrisDataBushels = {{ morris_data_bushels | safe }};
+        var csvData = {{ csv_data | safe }}
+        var csvDataBushels = {{ csv_data_bushels | safe }}
+        var averageYield = {{ average_yield | safe }}
+        var averageYieldBushels = {{ average_yield_bushels |safe }}
+        var lastYearYield = {{ last_yield |safe }}
+        var penultimateYear = {{ penultimate_year |safe }}
+        var penultimateYield = {{ penultimate_yield |safe }}
+        var penultimateYearBushels = {{ penultimate_year_bushels |safe }}
+        var lastYearYieldBushels =  {{ last_yield_bushels |safe }}
+        var high =  {{ high|safe }}
+        var low = {{ low | safe }}
+        var highBushels =  {{ high_bushels |safe }}
+        var lowBushels = {{ low_bushels | safe }}
+        var morrisLine;
+        console.log(penultimateYear);
+        initMorris();
+        getMorrisInKg();
+        {% if is_live %}
+        liveYieldResults();
+        {% endif %}
+
+        function initMorris() {
+            morrisLine = Morris.Line({
+                element: 'morris-line-chart',
+                xkey: 'y',
+                redraw: true,
+                resize: true,
+                smooth: false,
+                ykeys: ['a', 'b'],
+                hideHover: 'auto',
+                responsive: true,
+                labels: ['Yield', 'Average'],
+                lineColors: ['#1de9b6', '#04a9f5']
+            })
+        };
+
+        function setMorris(data) {
+            morrisLine.setData(data);
+        };
+
+        function getMorrisInKg() {
+            setMorris(morrisData);
+            userChoice = "kg";
+
+            {% if is_live == False %}
+            renderLow();
+            renderHigh();
+            {% endif %}
+            renderAverageAndYear();
+            renderUnits();
+        };
+
+        function getMorrisInBushels() {
+            setMorris(morrisDataBushels);
+            userChoice = "bushels";
+            {% if is_live == False %}
+            renderLow();
+            renderHigh();
+            {% endif %}
+            renderAverageAndYear();
+            renderUnits();
+        };
+
+        function renderUnits() {
+            var units = (userChoice == "kg")  ? "kg/ha" : "bsh/ac";
+            document.getElementById('calculated_units_value').innerHTML = "Units: (" + units + ")";
+        }
+
+
+        function renderAverageAndYear() {
+            var yearYield = (userChoice == "kg") ?  lastYearYield : lastYearYieldBushels;
+            var givenAverageYield = (userChoice == "kg") ?  averageYield : averageYieldBushels;
+            try{
+            document.getElementById('calculated_yearly_yield_value').innerHTML = yearYield.toString();
+            }catch{}
+            document.getElementById('calculated_average_yield_value').innerHTML = givenAverageYield.toString();
+        }
+        
+        function liveYieldResults(){
+            var penultimateYearYield = (userChoice == "kg") ?  penultimateYield : penultimateYearBushels;
+            document.getElementById('penultimate_yield_value').innerHTML = penultimateYearYield.toString();
+        }
+        
+        function renderLow() {
+            var lowResult =  (userChoice == "kg") ?  low : lowBushels;
+
+            document.getElementById('calculated_low_value').innerHTML = lowResult.toString();
+        }
+
+        function renderHigh() {
+            var highResult =  (userChoice == "kg") ?  high : highBushels;
+            var units = (userChoice == "kg")  ? "kg/ha" : "bsh/ac";
+            document.getElementById('calculated_high_value').innerHTML = highResult.toString();
+        }
+
+        function exportToCsv() {
+            var filename = (userChoice == "kg") ? '{{ crop_name }}-{{ location_name }}-yield-model-kg.csv' : '{{ crop_name }}-{{ location_name }}-yield-model-bushels.csv';
+            var rows = (userChoice == "kg") ?  csvData : csvDataBushels;
+            var processRow = function (row) {
+                var finalVal = '';
+                for (var j = 0; j < row.length; j++) {
+                    var innerValue = row[j] === null ? '' : row[j].toString();
+                    if (row[j] instanceof Date) {
+                        innerValue = row[j].toLocaleString();
+                    };
+                    var result = innerValue.replace(/"/g, '""');
+                    if (result.search(/("|,|\n)/g) >= 0)
+                        result = '"' + result + '"';
+                    if (j > 0)
+                        finalVal += ',';
+                    finalVal += result;
+                }
+                return finalVal + '\n';
+            };
+
+            var csvFile = '';
+            csvFile += "Year,"
+            csvFile += "{{ crop_name }} Yield Index,\n";
+            for (var i = 0; i < rows.length; i++) {
+                csvFile += processRow(rows[i]);
+            }
+
+            var blob = new Blob([csvFile], { type: 'text/csv;charset=utf-8;' });
+            if (navigator.msSaveBlob) { // IE 10+
+                navigator.msSaveBlob(blob, filename);
+            } else {
+                var link = document.createElement("a");
+                if (link.download !== undefined) { // feature detection
+                    // Browsers that support HTML5 download attribute
+                    var url = URL.createObjectURL(blob);
+                    link.setAttribute("href", url);
+                    link.setAttribute("download", filename);
+                    link.style.visibility = 'hidden';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+            }
+        };
+    </script>
+
+
+{% endblock javascripts %}
+
+{% block content %}
+
+    <div class="pcoded-content">
+        <div class="pcoded-inner-content">
+            <!-- [ breadcrumb ] start -->
+            <div class="page-header">
+                <div class="page-block">
+                    <div class="row align-items-center">
+                        <div class="col-md-12">
+                            <div class="page-header-title">
+                                <h5 class="m-b-10">Praedictus Yield Lab</h5>
+                            </div>
+                            <ul class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a></li>
+
+                                <li class="breadcrumb-item">
+                                    <a href="javascript:">Your {{ location_name }} {{ crop_name }} crop has been planted</a>
+                                </li>
+                                <li style="margin-left: auto;">
+                                {% if result.is_era %}
+                                <a class="btn btn-primary" href="/{{ request.user }}/wizard_view/?parent={{ result.id }}" role="button">Live Update</a>
+                                {% endif %}
+                            </li >
+                                <li class="breadcrumb-item" >
+                                    <form method="POST" action="{% url 'result' request.user.username result.id %}" id="export_inputs">
+                                        {% csrf_token %}
+                                        <button name="export_input" class="btn btn-primary" value="result.id">Export Inputs</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- [ breadcrumb ] end -->
+
+            <div class="main-body">
+                <div class="page-wrapper">
+                    {% if is_live %}
+                    <!--Row start-->
+                    <div class="row">
+                        <!--[ Historic Yield ] start-->
+                        <div class="col-md-6 col-xl-4">
+                            <div class="card Monthly-sales">
+                                <div class="card-block">
+                                    <h6 class="mb-4">Live Yield as of {{ result }}</h6>
+                                    {# <h6 class="mb-4" id="calculated_units_value"></h6>#}
+                                    <div class="row d-flex align-items-center live">
+
+                                        <div class="col-9">
+                                            <h3 class="f-w-300 d-flex align-items-center  m-b-0">
+                                                <div id="calculated_yearly_yield_value"></div>
+                                            </h3>
+                                        </div>
+                                        <div class="col-3 text-right">
+                                            <p class="m-b-0">({{ last_year| safe}})</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--[ Historic Yield section ] end-->
+                        <!--[ Average Yield section ] starts-->
+                        <div class="col-md-6 col-xl-4">
+                            <div class="card daily-sales">
+                                <div class="card-block">
+                                    <h6 class="mb-4">{{ penultimate_year |safe }} Final Yield</h6>
+                                    <div class="row d-flex align-items-center">
+                                        <div class="col-9">
+                                            <h3 class="f-w-300 d-flex align-items-center m-b-0"><i class="feather icon-activity text-c-green f-30 m-r-10"></i><div id="penultimate_yield_value"></div></h3>
+                                        </div>
+                                    </div>
+                                    <div class="progress m-t-30" style="height: 7px;">
+                                        <div class="progress-bar progress-c-theme" role="progressbar" style="width: 100%;" aria-valuenow="35" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--[ Average Yield section ] end-->
+                        <!--[ Historic high and low ] starts-->
+                        <div class="col-md-6 col-xl-4">
+                            <div class="card Monthly-sales">
+                                <div class="card-block">
+                                    <h6 class="mb-4">Average Final Yield</h6>
+                                    <div class="row d-flex align-items-center">
+                                        <div class="col-9">
+                                            <h3 class="f-w-300 d-flex align-items-center  m-b-0"><i class="feather icon-compass text-c-blue f-30 m-r-10"></i><div id="calculated_average_yield_value"></div></h3>
+                                        </div>
+                                    </div>
+                                    <div class="progress m-t-30" style="height: 7px;">
+                                        <div class="progress-bar progress-c-theme2" role="progressbar" style="width: 100%;" aria-valuenow="35" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--[ Average Yield section ] end-->
+                    </div>
+                    <!--Row end-->
+                    {% else %}
+                     <!--Row start-->
+                     <div class="row">
+                        <!--[ Historic Yield ] start-->
+                        <div class="col-md-6 col-xl-4">
+                            <div class="card daily-sales">
+                                <div class="card-block">
+                                    <h6 class="mb-4">{{ last_year|safe }} Yield</h6>
+                                    <div class="row d-flex align-items-center">
+                                        <div class="col-9">
+                                            <h3 class="f-w-300 d-flex align-items-center m-b-0"><i class="feather icon-activity text-c-green f-30 m-r-10"></i><div id="calculated_yearly_yield_value"></div></h3>
+                                        </div>
+                                    </div>
+                                    <div class="progress m-t-30" style="height: 7px;">
+                                        <div class="progress-bar progress-c-theme" role="progressbar" style="width: 100%;" aria-valuenow="35" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--[ Historic Yield section ] end-->
+                        <!--[ Average Yield section ] starts-->
+                        <div class="col-md-6 col-xl-4">
+                            <div class="card Monthly-sales">
+                                <div class="card-block">
+                                    <h6 class="mb-4">Average Yield</h6>
+                                    <div class="row d-flex align-items-center">
+                                        <div class="col-9">
+                                            <h3 class="f-w-300 d-flex align-items-center  m-b-0"><i class="feather icon-compass text-c-blue f-30 m-r-10"></i><div id="calculated_average_yield_value"></div></h3>
+                                        </div>
+                                    </div>
+                                    <div class="progress m-t-30" style="height: 7px;">
+                                        <div class="progress-bar progress-c-theme2" role="progressbar" style="width: 100%;" aria-valuenow="35" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--[ Average Yield section ] end-->
+                        <!--[ Historic high and low ] starts-->
+                        <div class="col-md-6 col-xl-4">
+                            <div class="card Monthly-sales">
+                                <div class="card-block">
+                                    <h6 class="mb-4">Historic High and Low</h6>
+                                    {# <h6 class="mb-4" id="calculated_units_value"></h6>#}
+                                    <div class="row d-flex align-items-center">
+                                        <div class="col-9">
+                                            <h3 class="f-w-300 d-flex align-items-center  m-b-0">
+                                                <div id="calculated_high_value"></div>
+                                            </h3>
+                                        </div>
+                                        <div class="col-3 text-right">
+                                            <p class="m-b-0">({{ high_year| safe}})</p>
+                                        </div>
+                                        <div class="col-9">
+                                            <h3 class="f-w-300 d-flex align-items-center  m-b-0">
+                                                <div id="calculated_low_value"></div>
+                                            </h3>
+                                        </div>
+                                        <div class="col-3 text-right">
+                                            <p class="m-b-0">({{ low_year| safe}})</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--[ Average Yield section ] end-->
+                    </div>
+                    <!--Row end-->
+                    {% endif %}
+                    {% if result.is_era %}
+                    <div style="margin-bottom: 20px;"> 
+                    <h5 style="margin-left: 15px;">Live Update list</h5>
+                    <p style="display:table; margin-left:15px;"> Live Yield as of {{ result }} {{ last_yield }}</p> 
+
+                    {% for i in results %}
+                    
+                    <p style="display:table; margin-left:15px;"> Live Yield as of {{ i }} {{ i.last_yield }}</p> 
+
+                    {% endfor %}
+                    
+                    
+                    <form action="{% url 'result' request.user.username result.id %}" method="POST" id="export_form"> 
+                        {% csrf_token %}    
+                        <button name="export_ids" class="btn btn-primary"> Export Live Updates </button>
+                    </form>
+                    {% endif %}
+                </div>
+
+                    <!--[ Tabs with Graph section ] start-->
+                    {% if is_weigted_index %}
+                    <div class="col-sm-12">
+                        <h5>Historical Yield </h5>
+                        <hr>
+                        <ul class="nav nav-tabs" id="myTab" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="kg-tab" data-toggle="tab" href="#" onclick="getMorrisInKg();" role="tab" aria-controls="home" aria-selected="true">Percent of Average</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content" id="myTabContent">
+                            <div id="morris-line-chart" style="height:630px"></div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="col-sm-12">
+                        <h5>Historical Yield </h5>
+                        <hr>
+                        <ul class="nav nav-tabs" id="myTab" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="kg-tab" data-toggle="tab" href="#" onclick="getMorrisInKg();" role="tab" aria-controls="home" aria-selected="true">Kilograms per hectare (kg/ha)</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="bushels-tab" data-toggle="tab" href="#" onclick="getMorrisInBushels();" role="tab" aria-controls="profile" aria-selected="false">Bushels per acre (bsh/ac)</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content" id="myTabContent">
+                            <div id="morris-line-chart" style="height:630px"></div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <!--[ Tabs with Graph section ] end-->
+                    <br><br>
+
+                    <div class ="row">
+                        <div class="col-md-6 col-xl-6">
+                            <!--[ Button for Risk] start-->
+                            <div class="card">
+                                <div class="card-block border-bottom">
+                                    <div class="row d-flex align-items-center">
+                                        <div class="col-auto">
+                                            <i class="feather icon-sunrise f-30 text-c-green"></i>
+                                        </div>
+                                        <div class="col">
+                                            <a href="/{{ user_name }}/results/{{ user_id }}/risk">Transfer Risk</a>
+                                            {#                                            <button class="btn btn-primary mb-2" onclick="location.href = '/{{ user_name }}/results/{{ user_id }}/risk'">Transfer Risk</button>#}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--[ Button for Risk] end-->
+                        </div>
+
+                        <div class="col-md-6 col-xl-6">
+                            <!--[ CSV Export section ] start-->
+                            <div class="card">
+                                <div class="card-block border-bottom">
+                                    <div class="row d-flex align-items-center">
+                                        <div class="col-auto">
+                                            <i class="feather icon-download f-30 text-c-blue"></i>
+                                        </div>
+                                        <div class="col">
+                                            {#                                            <span class="d-block text-uppercase">Download CSV</span>#}
+                                            <a href="javascript:exportToCsv('yield-model.csv', {{ graph_data }})">Download CSV</a>
+                                        </div>
+                                        <div class="col">
+                                            <div id="calculated_units_value"></div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--[ CSV Export section ] end-->
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}

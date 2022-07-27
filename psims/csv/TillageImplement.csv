@@ -1,0 +1,38 @@
+name,name_long
+TI001,V-Ripper
+TI002,Subsoiler
+TI003,Moldboard plow 20cm
+TI004,Chisel plow - sweeps
+TI005,Chisel plow - straight point
+TI006,Chisel plow - twisted shovel
+TI007,Disk plow
+TI008,Disk - 1-way
+TI009,Disk - tandem
+TI010,Disk - double disk
+TI011,Cultivator - field
+TI012,Cultivator - row
+TI013,Cultivator - ridge till
+TI014,Harrow - spike
+TI015,Harrow - tine
+TI016,Lister
+TI017,Bedder
+TI018,Blade cultivator
+TI019,Fertilizer applicator, anhydrous
+TI020,Manure injector
+TI021,Animal-drawn implement
+TI022,Mulch treader
+TI023,Plank
+TI024,Roller packer
+TI025,Drill - double-disk
+TI026,Drill - deep furrow
+TI031,Drill - no till
+TI032,Drill - no till (sod)
+TI033,Planter - row
+TI034,Planter - no till
+TI035,Planting stick (hand)
+TI036,Matraca hand planter
+TI037,Rod weeder
+TI038,Rotary hoe
+TI039,Roller harrow - cultipacker
+TI041,Moldboard plow 25cm
+TI042,Moldboard plow 30cm

@@ -1,0 +1,412 @@
+/*      html, body {*/
+/*            min-height: 100%;*/
+/*      }*/
+/*      body, div, form, input, select, textarea, p {*/
+/*            padding: 0;*/
+/*            margin: 0;*/
+/*            outline: none;*/
+/*            font-family: Roboto, Arial, sans-serif;*/
+/*            font-size: 14px;*/
+/*            color: #666;*/
+/*            line-height: 22px;*/
+/*      }*/
+/*      ul, li {*/
+/*            padding: 0;*/
+/*            padding-left: 15px;*/
+/*            margin-left: 0;*/
+/*            outline: none;*/
+/*            font-size: 14px;*/
+/*            color: #9e8557;*/
+/*            line-height: 22px;*/
+/*      }*/
+/*      h1 {*/
+/*            position: absolute;*/
+/*            margin: 0;*/
+/*            line-height: 55px;*/
+/*            font-size: 55px;*/
+/*            color: #fff;*/
+/*            z-index: 2;*/
+/*      }*/
+/*      .testbox {*/
+/*            display: flex;*/
+/*            justify-content: center;*/
+/*            align-items: center;*/
+/*            height: inherit;*/
+/*            padding: 20px;*/
+/*      }*/
+/*      form {*/
+/*            width: 100%;*/
+/*            padding: 20px;*/
+/*            border-radius: 6px;*/
+/*            background: #fff;*/
+/*            box-shadow: 0 0 30px 0 #aac6db;*/
+/*      }*/
+/*      .banner {*/
+/*            position: relative;*/
+/*            height: 230px;*/
+/*            background-image: url("/uploads/media/default/0001/02/3dd647f39593e88f45f61aaac6ff3027dce15506.jpeg");*/
+/*            background-size: cover;*/
+/*            display: flex;*/
+/*            justify-content: center;*/
+/*            align-items: center;*/
+/*            text-align: center;*/
+/*      }*/
+/*      .banner::after {*/
+/*            content: "";*/
+/*            background-color: rgba(0, 0, 0, 0.4);*/
+/*            position: absolute;*/
+/*            width: 100%;*/
+/*            height: 100%;*/
+/*      }*/
+/*      input, select, textarea {*/
+/*            margin-bottom: 10px;*/
+/*            border: 1px solid #ccc;*/
+/*            border-radius: 3px;*/
+/*      }*/
+/*      input {*/
+/*            width: calc(100% - 10px);*/
+/*            padding: 5px;*/
+/*      }*/
+/*      select {*/
+/*            width: 100%;*/
+/*            padding: 7px 0;*/
+/*            background: transparent;*/
+/*      }*/
+/*      textarea {*/
+/*            width: calc(100% - 12px);*/
+/*            padding: 5px;*/
+/*      }*/
+/*      .item:hover p, .item:hover i, .question:hover p, .question label:hover, input:hover::placeholder {*/
+/*            color: #477ba3;;*/
+/*      }*/
+/*      .item input:hover, .item select:hover, .item textarea:hover {*/
+/*            border: 1px solid transparent;*/
+/*            box-shadow: 0 0 6px 0 #477ba3;;*/
+/*            color: #477ba3;;*/
+/*      }*/
+/*      .item {*/
+/*            position: relative;*/
+/*            margin: 10px 0;*/
+/*      }*/
+/*      input[type=radio], input[type=checkbox]  {*/
+/*            !*display: none;*!*/
+/*      }*/
+/*      input.checkbox {*/
+/*            position: relative;*/
+/*            display: inline-block;*/
+/*            margin: 5px 20px 15px 0;*/
+/*            cursor: pointer;*/
+/*      }*/
+
+/*      input.checkbox:before {*/
+/*            content: "";*/
+/*            position: absolute;*/
+/*            left: 0;*/
+/*            width: 17px;*/
+/*            height: 17px;*/
+/*            border-radius: 50%;*/
+/*            border: 2px solid #ccc;*/
+/*      }*/
+/*      input[type=checkbox]:checked + label:before, label.radio:hover:before {*/
+/*            border: 2px solid #477ba3;;*/
+/*      }*/
+/*      input.checkbox:after {*/
+/*            content: "";*/
+/*            position: absolute;*/
+/*            top: 6px;*/
+/*            left: 5px;*/
+/*            width: 8px;*/
+/*            height: 4px;*/
+/*            border: 3px solid #477ba3;;*/
+/*            border-top: none;*/
+/*            border-right: none;*/
+/*            transform: rotate(-45deg);*/
+/*            opacity: 0;*/
+/*      }*/
+/*      input[type=checkbox]:checked + label:after {*/
+/*            opacity: 1;*/
+/*      }*/
+
+/*      label.radio:before {*/
+/*            content: "";*/
+/*            position: absolute;*/
+/*            left: 0;*/
+/*            width: 17px;*/
+/*            height: 17px;*/
+/*            border-radius: 50%;*/
+/*            border: 2px solid #ccc;*/
+/*      }*/
+/*      input[type=radio]:checked + label:before, label.radio:hover:before {*/
+/*            border: 2px solid #477ba3;;*/
+/*      }*/
+/*      label.radio:after {*/
+/*            content: "";*/
+/*            position: absolute;*/
+/*            top: 6px;*/
+/*            left: 5px;*/
+/*            width: 8px;*/
+/*            height: 4px;*/
+/*            border: 3px solid #477ba3;;*/
+/*            border-top: none;*/
+/*            border-right: none;*/
+/*            transform: rotate(-45deg);*/
+/*            opacity: 0;*/
+/*      }*/
+/*      input[type=radio]:checked + label:after {*/
+/*            opacity: 1;*/
+/*      }*/
+/*      .btn-block {*/
+/*            margin-top: 10px;*/
+/*            text-align: center;*/
+/*      }*/
+
+/*      input.btn-block {*/
+/*            width: 150px;*/
+/*            !*height: 47px;*!*/
+/*            padding-top: 12px;*/
+/*            padding-bottom: 10px;*/
+/*            border: none;*/
+/*            border-radius: 5px;*/
+/*            background: #477ba3;*/
+/*            font-size: 16px;*/
+/*            color: #fff;*/
+/*            cursor: pointer;*/
+/*      }*/
+
+/*     input.btn-block:hover {*/
+/*            box-shadow: 0 0 18px 0 #477ba3;*/
+/*     }*/
+
+/*      button {*/
+/*            width: 150px;*/
+/*            height: 42px;*/
+/*            padding: 10px;*/
+/*            border: none;*/
+/*            border-radius: 5px;*/
+/*            background: #477ba3;*/
+/*            font-size: 16px;*/
+/*            color: #fff;*/
+/*            cursor: pointer;*/
+/*      }*/
+
+/*      button:hover {*/
+/*            box-shadow: 0 0 18px 0 #477ba3;*/
+/*      }*/
+/*      @media (min-width: 568px) {*/
+/*      .name-item, .city-item {*/
+/*      display: flex;*/
+/*      flex-wrap: wrap;*/
+/*      justify-content: space-between;*/
+/*      }*/
+/*      .name-item input, .city-item input {*/
+/*      width: calc(50% - 20px);*/
+/*      }*/
+/*      .city-item select {*/
+/*      width: calc(50% - 8px);*/
+/*      }*/
+/*      }*/
+/* hr.blueLine {*/
+/*  border: 40px #477ba3;*/
+/*  border-radius: 5px;*/
+/*}*/
+
+/* .wizardSteps {*/
+/*       font-size: 11px;*/
+/*       float:right;*/
+/* }*/
+
+/* .logo {*/
+/*       padding-top: 10px;*/
+/*       padding-left: 32px;*/
+/* }*/
+
+/* .logo_results {*/
+/*    padding-top: 10px;*/
+/*    padding-left: 400px;*/
+/*    padding-bottom: 30px;*/
+/*}*/
+
+/* .wizardWrapper {*/
+/*       width: 50%;*/
+/*       padding-top: 10px;*/
+/*       padding-left: 30px;*/
+/*       padding-bottom: 10px;*/
+/* }*/
+
+
+
+/*#id_3-irrig {*/
+/*      !*float: left;*!*/
+/*}*/
+
+/*#id_5-till {*/
+/*      !*float: left*!*/
+/*}*/
+
+/*.sidebar {*/
+/*height: 100%;*/
+/*width: 150px;*/
+/*position: absolute;*/
+/*left: 0;*/
+/*top: 0;*/
+/*padding-top: 40px;*/
+/*background-color: lightblue;*/
+/*}*/
+
+/*.sidebar div {*/
+/*padding: 8px;*/
+/*font-size: 24px;*/
+/*display: block;*/
+/*}*/
+
+/*.body-text {*/
+/*margin-left: 150px;*/
+/*font-size: 18px;*/
+/*}*/
+
+/*.sidebar_left {*/
+/*height: 100%;*/
+/*width: 300px;*/
+/*position: absolute;*/
+/*right: 0;*/
+/*top: 0;*/
+/*padding-top: 40px;*/
+/*background-color: white;*/
+/*}*/
+
+/*.sidebar_left div {*/
+/*    padding: 8px 100px 8px 8px;*/
+/*    font-size: 24px;*/
+/*display: block;*/
+/*}*/
+
+
+/** {*/
+/*  box-sizing: border-box;*/
+/*}*/
+
+/*!* Create two equal columns that floats next to each other *!*/
+/*.column_results {*/
+/*  float: left;*/
+/*  width: 50%;*/
+/*  padding: 10px;*/
+/*  height: 300px; !* Should be removed. Only for demonstration *!*/
+/*}*/
+
+/*!* Clear floats after the columns *!*/
+/*.row_results:after {*/
+/*  content: "";*/
+/*  display: table;*/
+/*  clear: both;*/
+/*}*/
+
+
+/*.result_buttons {*/
+/*    width: 210px;*/
+/*    height: 84px;*/
+/*    padding: 10px;*/
+/*    border: none;*/
+/*    border-radius: 5px;*/
+/*    background: lightblue;*/
+/*    font-size: 16px;*/
+/*    color: #fff;*/
+/*    cursor: pointer;*/
+/*    margin: 20px;*/
+/*    text-align: left;*/
+/*    text-transform: uppercase;*/
+/*}*/
+
+
+input, select, textarea, p {
+      display: block;
+      width: 77%;
+      height: calc(2.25rem + 2px);
+      padding: 0.375rem 0.75rem;
+      font-size: 1rem;
+      line-height: 1.5;
+      color: #495057;
+      background-color: #fff;
+      background-clip: padding-box;
+      border: 1px solid #ced4da;
+      border-radius: 0.25rem;
+      transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+      margin-bottom: 1rem !important;
+}
+
+/*input#id_3-irrig { position: absolute; opacity: 0; z-index: -1; }*/
+/*input#id_3-irrig  { position: absolute; opacity: 0; z-index: -1; }*/
+/*input#id_3-irrig +span { font: 16pt sans-serif; color: #000; }*/
+/*input#id_3-irrig +span:before { font: 16pt FontAwesome; content: '\00f096'; display: inline-block; width: 16pt; padding: 2px 0 0 3px; margin-right: 0.5em; }*/
+/*input#id_3-irrig :checked+span:before { content: '\00f046'; }*/
+/*input#id_3-irrig :focus+span:before { outline: 1px dotted #aaa; }*/
+/*input#id_3-irrig :disabled+span { color: #999; }*/
+/*input#id_3-irrig :not(:disabled)+span:hover:before { text-shadow: 0 1px 2px #77F; }*/
+
+
+ input[type="checkbox"] {
+       display: block;
+       width: 5%;
+       /*height: calc(2.25rem + 2px)*/
+ }
+/*input[type="checkbox"] {*/
+/*      width: 14%;*/
+/*      height: 14%;*/
+/*}*/
+
+/*input[type="checkbox"] { position: absolute; opacity: 0; z-index: -1; }*/
+/*input[type="checkbox"]+span { font: 16pt sans-serif; color: #000; }*/
+/*input[type="checkbox"]+span:before { font: 16pt FontAwesome; content: '\00f096'; display: inline-block; width: 16pt; padding: 2px 0 0 3px; margin-right: 0.5em; }*/
+/*input[type="checkbox"]:checked+span:before { content: '\00f046'; }*/
+/*input[type="checkbox"]:focus+span:before { outline: 1px dotted #aaa; }*/
+/*input[type="checkbox"]:disabled+span { color: #999; }*/
+/*input[type="checkbox"]:not(:disabled)+span:hover:before { text-shadow: 0 1px 2px #77F; }*/
+
+
+/*https://stackoverflow.com/questions/4148499/how-to-style-a-checkbox-using-css*/
+
+/*#id_3-irrig {*/
+/*    background: white;*/
+/*  width: 120px;*/
+/*  height: 40px;*/
+/*  -webkit-appearance: initial;*/
+/*  border-radius: 3px;*/
+/*  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);*/
+/*  outline: none;*/
+/*  font-size: 14px;*/
+/*  font-family: Trebuchet, Arial, sans-serif;*/
+/*  font-weight: bold;*/
+/*  cursor: pointer;*/
+/*  border: 1px solid #ddd;*/
+/*}*/
+
+/*#id_3-irrig:after {*/
+/*  position: absolute;*/
+/*  top: 5%;*/
+/*  display: block;*/
+/*  line-height: 32px;*/
+/*  width: 45%;*/
+/*  height: 90%;*/
+/*  background: #fff;*/
+/*  box-sizing: border-box;*/
+/*  text-align: center;*/
+/*  transition: all 0.3s ease-in 0s;*/
+/*  color: #336ba7;*/
+/*  border: #888 1px solid;*/
+/* border-radius: 3px;*/
+/*}*/
+
+/*#id_3-irrig:after {*/
+/*  left: 2%;*/
+/*  content: "OFF";*/
+/*}*/
+
+/*#id_3-irrig:checked:after {*/
+/*      left: 53%;*/
+/*      content: "ON";*/
+/*}*/
+
+.success_message {
+      margin:0 auto;
+      display: block;
+      text-align: center;
+}

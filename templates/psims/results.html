@@ -1,0 +1,540 @@
+{% extends  "layouts/base.html" %}
+{% block title %} Page Blank {% endblock %}
+{% load static %}
+{% block content %}
+    <style>
+a:link {
+  text-decoration: none;
+}
+
+a:visited {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+.btn{
+  tooltip-color:white;
+}
+a:active {
+  text-decoration: underline;
+}
+
+
+
+
+.pcoded-content-popup {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: rgb(0, 0, 0, .3);
+  z-index: 999;
+  visibility: hidden;
+  opacity: 0;
+}
+
+.pcoded-content-popup.open {
+  visibility: visible;
+  opacity: 1;
+}
+
+.popup-wrapper {
+  width: 800px;
+  min-height: 600px;
+  height: auto;
+  background-color: #f4f7fa;
+  border-radius: 4px;
+  position: relative;
+  padding: 16px;
+  transform: scale(0);
+  visibility: hidden;
+  opacity: 0;
+  transition: .3s ease;
+}
+
+.popup-wrapper.open {
+  transform: scale(1);
+  visibility: visible;
+  opacity: 1;
+}
+
+
+.popup-close {
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  cursor: pointer;
+}
+
+.popup-close:before,
+.popup-close:after {
+  content: '';
+  width: 100%;
+  height: 2px;
+  position: absolute;
+  top: calc(50% - 1px);
+  left: 0;
+  background-color: #0069d9;
+  border-radius: 50px;
+  transition: .3s ease;
+}
+
+
+.popup-close:before {
+  transform: rotate(45deg);
+}
+
+.popup-close:after {
+  transform: rotate(-45deg);
+}
+
+.popup-close:hover:before,
+.popup-close:hover:after {
+  transform: rotate(0);
+}
+
+.popup-item {
+  max-height: 500px;
+  height: 100%;
+  padding-top: 5px;
+  margin-bottom: 48px;
+  overflow-y: auto;
+}
+
+.popup-item > div {
+  margin: 10px 0;
+}
+
+.popup-item > div span {
+  margin-right: 24px;
+}
+
+.popup-button {
+  position: absolute;
+  bottom: 10px;
+  left: calc(50% - 100px);
+  width: 200px;
+}
+
+.popup-button button {
+  width: 100%;
+  height: 40px;
+  background-color: #0069d9;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+  outline: none;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: .3s ease;
+}
+
+.popup-button button:hover {
+  opacity: .9;
+}
+
+.warning {
+  width: 190px;
+  height: 72px;
+  visibility: hidden;
+  position: absolute;
+  text-align: center;
+  background-color: #fff;
+  box-shadow: -2px 8px 16px rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  transform-origin: top;
+  transform: scale(0);
+  transition: .3s ease;
+}
+
+.live-warning{
+  width: 200px;
+  height: 72px;
+  visibility: hidden;
+  position: absolute;
+  text-align: center;
+  background-color: #fff;
+  box-shadow: -2px 8px 16px rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  transform-origin: top;
+  transform: scale(0);
+  transition: .3s ease;
+  right:0px;
+}
+
+.csv-warning{
+  width: 200px;
+  height: 40px;
+  visibility: hidden;
+  position: absolute;
+  text-align: center;
+  background-color: #fff;
+  box-shadow: -2px 8px 16px rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  transform-origin: top;
+  transform: scale(0);
+  transition: .3s ease;
+  right:0px;
+}
+
+.combine-warning{
+  width: 200px;
+  height: 40px;
+  visibility: hidden;
+  position: absolute;
+  text-align: center;
+  background-color: #fff;
+  box-shadow: -2px 8px 16px rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  transform-origin: top;
+  transform: scale(0);
+  transition: .3s ease;
+  right:0px;
+}
+
+.warning.error {
+  height: 85px;
+  padding-right: 20px;
+  background-color: #ED2A26;
+  color: #fff;
+}
+.live-warning.live-error{
+    height: 55px;
+    padding-right: 20px;
+  background-color: #ED2A26;
+  color: #fff;
+}
+.csv-warning.csv-error{
+  width:250px;
+  height: 55px;
+  background-color: #ED2A26;
+  color: #fff;
+}
+
+.combine-warning.combine-error{
+  width:250px;
+  height: 55px;
+  background-color: #ED2A26;
+  color: #fff;
+}
+
+.warning:before {
+  content: 'Select indices and click here to create a weighted index.';
+  position: absolute;
+  width: 90%;
+  left: 5%;
+  top: 5px;
+}
+
+.live-warning:before{
+  content: 'Select indices and click here to delete jobs.';
+  position: absolute;
+  width: 90%;
+  left: 5%;
+  top: 5px;
+}
+
+.csv-warning:before{
+  content: 'Select indices and click here to delete jobs.';
+  position: absolute;
+  width: 90%;
+  left: 5%;
+  top: 5px;
+}
+
+.combine-warning:before{
+  content: 'Select indices and click here to delete jobs.';
+  position: absolute;
+  width: 90%;
+  left: 5%;
+  top: 5px;
+}
+
+.warning.error:before {
+  content: 'Please select at least 2 rows to create a weighted index.';
+}
+.live-warning.live-error:before{
+  content: 'Please select any row to delete the job.';
+}
+.csv-warning.csv-error:before{
+  content: 'Please select a row to export csv file.';
+}
+.combine-warning.combine-error:before{
+  content: 'Please select a job to export csv file.';
+}
+.wieg:hover .warning,
+.warning.error {
+  transform: scale(1);
+  visibility: visible;
+}
+ .btn-live:hover .live-warning,
+.live-warning.live-error {
+  transform: scale(1);
+  visibility: visible;
+}
+
+btn-csv:hover .csv-warning, .csv-warning.csv-error{
+  transform: scale(1);
+  visibility: visible;
+}
+
+combine_button:hover .combine-warning, .combine-warning.combine-error{
+  transform: scale(1);
+  visibility: visible;
+}
+
+.enter-weights-block span {
+  display: block;
+  min-width: 20%;
+}
+.popup-title{
+  margin-bottom: 10px;
+}
+
+.weighted-results-table {
+  width: 100%;
+}
+
+.weighted-results-content td {
+  padding: 16px;
+}
+
+.location-name > p {
+  display: block;
+  width: 150px;     
+  word-break: break-word;
+}
+.live{
+display: block;
+margin-top:10px
+}
+.fa-sync{
+  display:block;
+  margin-top:20px;
+}
+.btn-result{
+  min-width:120px;
+}
+.csv-li {
+  margin-left: auto;
+}
+
+    </style>
+    
+    <div class="pcoded-content">
+    <div class="pcoded-content-popup">
+    
+      <div class="popup-wrapper">
+        <div class="popup-close">
+        </div>
+
+        <form class="popup-content" id="weighted_index_form" method="post"  action="{% url 'results' username %}" onsubmit="getValues()">
+      
+
+        
+          <div class="popup-title">
+            Enter index weights
+          </div>
+          <div class="popup-title">
+            <input name="weighted_name" type="text" value="Weighted Index 1">
+          </div>
+          <input name="weighted_index" hidden id="weightedResults">
+          <input name="ids" hidden id="inds">
+        
+          <div class="popup-item" >
+          
+            <table class="weighted-results-table">
+              <thead>
+                <tr>
+                  <th style="padding: 16px;">Date Time</th>
+                  <th style="padding: 16px;">Crop Name</th>
+                  <th style="padding: 16px;">Location Name</th>
+                  <th style="padding: 16px;">Index Weights</th>
+                </tr>
+              </thead>
+              <tbody class="weighted-results-content">
+
+              </tbody>
+            </table>
+          </div>
+
+          <div class="popup-button">
+            <button type="submit" id="createWeightedIndex">
+              Create Weighted Index
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+        <div class="pcoded-inner-content">
+            <!-- [ breadcrumb ] start -->
+            <div class="page-header">
+                <div class="page-block">
+                    <div class="row align-items-center">
+                        <div class="col-md-12">
+                            <div class="page-header-title">
+                                <h5 class="m-b-10">Praedictus Yield Lab</h5>
+                            </div>
+            <ul class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a></li>
+                <li class="breadcrumb-item"><a href="javascript:">Report History</a></li>
+
+                <li class="csv-li" style="position:relative;">
+                  <form id="csv_data_form" method="POST"  action="{% url 'results' username %}">
+                    <input name="checkbox_index" hidden id="csvindex">
+                      <button class="btn btn-primary btn-csv" id="exportCsv">Export to .csv</button>
+                    <div class="csv-warning"></div>
+                  </form>
+                </li>
+
+                <li class="wieg-li">
+                  <button class="btn btn-primary" id="createWeighted" >
+                    Create Weighted Index
+                  </button>
+                  <div class="warning">
+                  </div>
+                </li>
+
+                <li class="combine_outputs">
+                  <form id="combine_form" class="form_combine_outputs" method="POST"  action="{% url 'results' username %}">
+                  <input name="combine_name" hidden id="combine_index">
+                    <button class="btn btn-primary" id="combine_button">Combine Outputs</button>
+                    <div class="combine-warning"></div>
+                  </form>
+                </li>
+
+                <li class="delete-li">
+                  <form id="delete_form" class="form-live" method="POST"  action="{% url 'results' username %}">
+                    <button class="btn btn-primary btn-live" id="live-button">Delete</button>
+                    <div class="live-warning"></div>
+                    <input name="delete_index" hidden id="deleteindex">
+                  </form>
+                </li>
+                 </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- [ breadcrumb ] end -->
+
+            <div class="main-body">
+            <div class="row">
+            
+<table class="table table-hover js-sort-table"  id="myTable">
+  <thead>
+    <tr>
+      <th scope="col"  style="color:#4faec2">Date/Time</th>
+      <th scope="col" style="color:#4faec2">Location</th>
+      <th scope="col" style="color:#4faec2" class="js-sort-string">Crop</th>
+      <th scope="col" style="color:#4faec2">Planting date</th>
+      <th scope="col" style="color:#4faec2">Latitude/Longitude</th>
+
+      <th scope="col" style="color:#4faec2" class="js-sort-date"><a id="myLinkAverage" href="#" onclick="sortTableNum(6);">Average Yield</a></th>
+      <script>
+
+      </script>
+    </tr>
+  </thead>
+  {% for result in results %}
+
+  <tbody id="myBody">
+  {% if result.is_deleted == False and result.is_live == False %}
+    <tr id={{ result.id }} class="rows" onclick="viewResult('{{ username }}', '{{ result.id }}')">
+      <td> <input type="checkbox"  class="location-checkbox" autocomplete="off" id="checkbox_id{{ result.id }}" name="indexes" style="margin-top:2px; width: 17px; height: 17px;"> 
+      {% if result.is_parent %}
+      <i class="fas fa-sync" style="color:rgb(90, 83, 255)" title="Live Update">
+      </i>
+      {% endif %} 
+      </td>
+      
+      {% if result.is_open == False %}
+      <td class="date-time" style="font-weight: 700; color:363535;"><p style="font-size: 17px;" class='table-text'>
+        <span style="display:none;font-size: 17px;">YYYYMMDD</span> {{ result }}</span> 
+      </td>
+      {% if result.is_weighted_index %}
+      <td class="location-name" style="font-weight: 700; white-space: unset; color:363535; text-align:center;">-
+      </td>
+      {% else %}
+      <td class="location-name" style="font-weight: 700; white-space: unset; color:363535;">
+        <p style="font-size: 17px;" class='table-text'>{{ result.location.name }}</p>
+      </td>
+            {% endif %}
+
+      <td class="crop-name" style="font-weight: 700; color:363535;">
+        <p style="font-size: 17px;" class='table-text'>{{ result.crop.name }}</p>
+      </td>
+      <td  style="font-weight: 700; color:363535;">
+        <p style="font-size: 17px;" class="planting-date">{{ result.planting_day.planting_date }}</p>
+      </td>
+      {% if result.is_weighted_index %}
+      <td  style="font-weight: 700; color:363535;text-align:center;">-</td>
+
+{% else %}      
+      <td  style="font-weight: 700; color:363535;"><p style="font-size: 17px;" class="lngLat">{{ result.location.latitude }}, {{ result.location.longitude }}</p></td>
+      {% endif %}
+
+      <td  style="font-weight: 700; color:363535"><p style="font-size: 17px;" class='table-text'>{{ result.average_yield }}</p></td>
+      <td>
+        <a class="btn btn-primary btn-result" href="/{{ username }}/results/{{ result.id }}" role="button">View</a>
+      
+            {% if result.is_era %}
+            {% if result.is_weighted_index == False %}
+            
+              <a class="btn btn-primary live btn-result" href="/{{ username }}/wizard_view/?parent={{ result.id }}" role="button">Live Update</a>
+            </td>
+            {% endif %}
+            {% endif %}
+      {% else %}
+      <td class="date-time" ><p style="font-weight: 400;font-size: 17px;" class='table-text'>{{ result }}</p></td>
+      {% if result.is_weighted_index %}
+      <td class="location-name" style="text-align:center;">-</td>
+      {% else %}
+      <td class="location-name" style="white-space: unset;"><p style="font-weight: 400;font-size: 17px;" class='table-text'>{{ result.location.name }}</p></td>
+      {% endif %}
+      <td class="crop-name"><p style="font-weight: 400;font-size: 17px;" class='table-text'>{{ result.crop.name }}</p></td>
+      <td ><p style="font-weight: 400;font-size: 17px;" class="planting-date">{{ result.planting_day.planting_date }}</p></td>
+            {% if result.is_weighted_index %}
+      <td style="text-align:center;">-</td>
+      {% else %}
+      <td ><p style="font-weight: 400;font-size: 17px;" class="lngLat">{{ result.location.latitude }}, {{ result.location.longitude }}</p></td>
+      {% endif %}
+      <td class="t"><p style="font-weight: 400;font-size: 17px;" class='table-text'>{{ result.average_yield }}</p></td>
+      <td>
+          <a class="btn btn-primary btn-result" href="/{{ username }}/results/{{ result.id }}" role="button">View</a>
+      
+      {% if result.is_era %}
+      {% if result.is_weighted_index == False %}
+      
+        <a class="btn btn-primary live btn-result" href="/{{ username }}/wizard_view/?parent={{ result.id }}" role="button" disabled>Live Update</a>
+      </td>
+      {% endif %}
+      {% endif %}
+      {% endif %}
+  
+  {% endif %}
+  </tbody>
+  <script>
+
+  </script>
+  {% endfor %}
+</table>
+    </div>  
+    </div>
+    </div>
+{% endblock content %}
+{% block javascripts %}
+<script type="text/javascript" src="{% static 'psims/js/tablesort.js' %}">
+</script>
+<script type="text/javascript" src="{% static 'psims/js/average_column_sort.js' %}">
+</script>
+{% endblock javascripts %}

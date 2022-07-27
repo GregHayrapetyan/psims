@@ -1,0 +1,218 @@
+<!-- jquery ui css and js -->
+{% load static %}
+<link href='https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/ui-lightness/jquery-ui.css' rel='stylesheet'>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script src="https://kit.fontawesome.com/e48046f0c9.js" crossorigin="anonymous"></script>
+<link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="Stylesheet"
+  type="text/css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+<input name="{{name}}" type="hidden" value="{{value}}" />
+<input id="pd" type="hidden" value="" />
+<div id='datepicker'></div>
+<script defer>
+  function dateFromDay(day) {
+    var date = new Date(new Date().getFullYear(), 0,1); // initialize a date in `year-01-01`
+    return new Date(date.setDate(day)); // add the number of days
+  }
+
+  function dayFromDate(dt) {
+    var current = new Date(dt.getTime());
+
+    var previous = new Date(dt.getFullYear(), 0,0);
+    let days = Math.ceil((current - previous) / 86400000)
+    return days
+
+  }
+  function setInitDate() {
+    let value = parseInt(document.getElementById('pd').value)
+    return value
+  }
+  $(document).ready(function () {
+    $(function () {
+      let $j = jQuery.noConflict();
+      let element = $("#datepicker")[0]
+      let form = $(element).closest("form").get()
+      form = $(form)[0]
+      $j("#datepicker").datepicker({
+        dateFormat: "dd-mm-yy",
+        yearRange: new Date().getFullYear() + ":" + new Date().getFullYear(),
+        onSelect: function () {
+          d = $j("#datepicker").val()
+          let selectedDay = d.split("-")[0]
+          let selectedMonth = d.split("-")[1]
+          let selectedYear = d.split("-")[2]
+          $j("input[name={{name}}]").val(dayFromDate(new Date(`${selectedMonth}-${selectedDay}-${selectedYear}`)))
+        }
+      })
+      if(!$j("input[name={{name}}]").val()){
+      $j("#datepicker").datepicker("setDate", dateFromDay(setInitDate()));
+        $j("input[name={{name}}]").val(parseInt(setInitDate()))
+      }else{
+        $j("#datepicker").datepicker("setDate", dateFromDay($j("input[name={{name}}]").val()));
+      }
+    });
+  })
+
+</script>
+
+<style>
+  .ui-datepicker-year {
+    display: none
+  }
+
+  #datepicker {
+    margin-bottom: 10px;
+  }
+
+  .ui-state-active,
+  .ui-widget-content .ui-state-active,
+  .ui-widget-header .ui-state-active {
+    background: #28a745;
+
+  }
+
+  .planting {
+    width: 200px;
+    margin: 0 !important;
+  }
+
+  .button-home {
+    background: none;
+    color: inherit;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+    outline: inherit;
+    margin-bottom: 0px !important;
+  }
+
+  .add__wrapper {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    width: 300px;
+  }
+
+  .fa-trash-o {
+    font-size: 20px;
+    color: black;
+    margin-left: 5px;
+    cursor: pointer;
+  }
+</style>
+<label id="img-label">Add additional planting dates</label>
+<div class="add" id="plus"></div>
+<div id="img">
+
+</div>
+<div id="img-wrapper">
+  <input type="image" class="button-home"  style="width: 40px; height: 40px;" src="{% static 'psims/img/plus.png' %}">
+</div>
+<br>
+<script>
+  let buttonHome = document.querySelector(".button-home");
+  let CountClicks = 0;
+  let dates_array = []
+  var dates = null
+  let trash = null
+  buttonHome.addEventListener("click", function (e) {
+    e.preventDefault()
+
+    CountClicks += 1;
+    let div = document.createElement('div')
+    div.setAttribute('id', `wrapper_${CountClicks}`)
+    div.classList.add('add__wrapper')
+    let input = document.createElement('input')
+    let i = document.createElement('i')
+    var today = new Date();
+    var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+    input.setAttribute('type', 'date')
+    input.setAttribute('id', `${CountClicks}`)
+    input.setAttribute('name', 'planting')
+    input.setAttribute('placeholder', "02/02/2020")
+    input.setAttribute('oninput', "func()")
+    input.classList.add('planting')
+    i.setAttribute('id', `trash_${CountClicks}`)
+    i.setAttribute('onclick', 'deleteInput()')
+    i.classList.add('fa')
+    i.classList.add('fa-trash-o')
+    div.appendChild(input)
+    div.appendChild(i)
+
+    const formatYmd = date => date.toISOString().slice(0, 10);
+
+    let default_value = dateFromDay(parseInt(document.getElementById('pd').value))
+    let formated_date =  moment(default_value).format('YYYY-MM-DD')
+    input.value = `${formated_date}`
+    
+    dayOfYearValue = dayOfYear(new Date(input.value));
+    dates_array.push(dayOfYearValue)
+
+    if (CountClicks <= 8) {
+      document.getElementById('id_2-add_planting_dates').value = dates_array
+      document.getElementById('plus').appendChild(div)
+    }
+    // let dates = document.querySelectorAll('.planting')
+    // dates_array.push(document.querySelectorAll('.planting')) 
+  });
+const dayOfYear = date => Math.floor((date - Date.UTC(date.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
+
+function getValue(){
+  dates_array = []
+  document.querySelectorAll('.planting').forEach((element) =>{
+    if(element.value){
+      console.log(element.value)
+      dayOfYearValue = dayOfYear(new Date(element.value));
+      dates_array.push(dayOfYearValue)
+      
+    }
+    else{
+      alert('set date')
+    }
+  })
+  document.getElementById('id_2-add_planting_dates').value = dates_array
+}
+function deleteInput(){
+  let e = window.event
+  trash = document.querySelectorAll('.fa-trash-o')
+  trash.forEach((element, idx, array) =>{
+    element.getAttribute('id') == e.target.getAttribute('id');
+    let trash_id = e.target.id.substr(e.target.id.length - 1);
+    let inp = document.getElementById(`wrapper_${trash_id}`);
+    inp.remove();
+    getValue();
+  })
+}
+
+
+function func() {
+  dates_array = []
+  document.querySelectorAll('.planting').forEach((element) =>{
+    if(element.value){
+      let splitedDate = element.value.split('-')
+      console.log("date", new Date(Date.UTC(splitedDate[0],splitedDate[1],splitedDate[2])));
+      dayOfYearValue = dayOfYear(new Date(Date.UTC(splitedDate[0],splitedDate[1] - 1,splitedDate[2])));
+      console.log(dayOfYearValue)
+      dates_array.push(dayOfYearValue)
+      
+    }
+    else{
+      alert('set date')
+    }
+  })
+  document.getElementById('id_2-add_planting_dates').value = dates_array
+}
+
+</script>
+<script defer src="https://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js" type="text/javascript"></script>
+<script defer src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js" type="text/javascript"></script>
+
+
+
+
+
+
+

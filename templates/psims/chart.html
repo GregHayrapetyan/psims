@@ -1,0 +1,138 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Page Blank {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}
+    <link rel="stylesheet" href="/static/assets/plugins/chart-morris/css/morris.css">
+    <link rel="stylesheet" href="/static/assets/plugins/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<style>
+
+.big-chart{
+
+  position: absolute;
+  margin-top: 400px; 
+  margin-left: 10px
+}
+
+.small-chart{
+  height: 200px !important;
+  position: absolute; 
+  margin-left: 60%; 
+  margin-top: 540px; 
+}
+.small-chart:hover{
+cursor:pointer;
+}
+.button {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 2px 30px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius:5px;
+}
+.div-button{
+    margin-top: 50px;
+    position: absolute;
+}
+.div-button-1{
+    margin-top: 150px;
+    position: absolute;
+    margin-left: 200px;
+}
+.button1 {
+  background-color: white;
+  color: black;
+  border: 2px solid #4CAF50;
+  margin-left: 40px;
+}
+</style>
+
+{% endblock stylesheets %}
+
+{% block javascripts %}
+<script src="/static/assets/plugins/chart-morris/js/raphael.min.js"></script>
+<script src="/static/assets/plugins/chart-morris/js/morris.min.js"></script>
+<script>
+  var data = [
+        { y: '2014', a: 50, b: 90},
+        { y: '2015', a: 65,  b: 75},
+        { y: '2016', a: 50,  b: 50},
+        { y: '2017', a: 75,  b: 60},
+        { y: '2018', a: 80,  b: 65},
+        { y: '2019', a: 90,  b: 70},
+        { y: '2020', a: 100, b: 75},
+        { y: '2021', a: 115, b: 75},
+        { y: '2022', a: 120, b: 85},
+        { y: '2023', a: 145, b: 85},
+        { y: '2024', a: 160, b: 95}
+      ],
+      config = {
+        data: data,
+        xkey: 'y',
+        ykeys: ['a', 'b'],
+        labels: ['Total Income', 'Total Outcome'],
+        fillOpacity: 0.6,
+        hideHover: 'auto',
+        behaveLikeLine: true,
+        redraw: true,
+        resize: true,
+        smooth: false,
+        labels: ['Yield', 'Average'],
+        lineColors: ['#1de9b6', '#04a9f5']
+    };
+        configForSmall = {
+        data: data,
+        xkey: 'y',
+        ykeys: ['a', 'b'],
+        labels: ['Total Income', 'Total Outcome'],
+        fillOpacity: 0.6,
+        hideHover: 'auto',
+        behaveLikeLine: true,
+        redraw: true,
+        resize: true,
+        smooth: false,
+        labels: ['Yield', 'Average'],
+        lineColors: ['#1de9b6', '#04a9f5']
+    };
+  config.element = 'big-line-chart';
+  configForSmall.element = 'small-line-chart';
+  let bigChart = Morris.Line(config);
+  let smallChart = Morris.Line(configForSmall);
+
+  $('#big-line-chart').resize(function () {
+  bar.redraw();
+});
+  </script>
+{% endblock javascripts %}
+
+{% block content %}
+<div class="div-button">
+  <button class="button button1">5000</button>
+  <button class="button button1">5000</button>
+  <button class="button button1">5000</button>
+  <button class="button button1">5000</button>
+</div>
+<h6 style="position:absolute; margin-left: 160px; margin-top: 160px">Some text</h6>
+<div class="div-button-1">
+
+  <button class="button button1">5000</button>
+</div>
+
+  <div class="col-sm-7 big-chart">
+    <div id="big-line-chart" ></div>
+  </div>  
+  {% for result in results %}
+  <div>
+    <div id="small-line-chart" class="col-sm-4 small-chart" onclick="location.href='/{{ username }}/results/{{ result.id }}';"></div>
+  </div>
+{% endfor %}
+{% endblock content %}
+
